@@ -2,18 +2,19 @@ import React, { useState, useRef } from 'react';
 import { Upload, Download, RefreshCw, Calendar, Hash } from 'lucide-react';
 import * as Papa from 'papaparse';
 
-const UltimateDataCleaningTool = () => {
+const DataCleaningTool = () => {
   const [data, setData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
   const [results, setResults] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Keep your existing date standardization (you said it's okay)
+  // Date standardization function
   const standardizeDate = (dateStr) => {
     if (!dateStr || dateStr.trim() === '') return '';
     
     const cleaned = dateStr.toString().trim();
     
+    // Handle number formats
     const anyNumbers = cleaned.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
     if (anyNumbers) {
       let num1 = parseInt(anyNumbers[1]);
@@ -22,8 +23,7 @@ const UltimateDataCleaningTool = () => {
       
       if (num1 > 31 || anyNumbers[1].length === 4) {
         return `${num2}/${num3}/${num1}`;
-      }
-      else {
+      } else {
         if (num3 < 100) {
           num3 = num3 < 50 ? 2000 + num3 : 1900 + num3;
         }
@@ -31,6 +31,7 @@ const UltimateDataCleaningTool = () => {
       }
     }
     
+    // Handle text months
     const monthNames = {
       jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3,
       apr: 4, april: 4, may: 5, jun: 6, june: 6,
@@ -60,7 +61,7 @@ const UltimateDataCleaningTool = () => {
     return cleaned;
   };
 
-  // Keep your existing ID assignment
+  // Assign transaction IDs
   const assignTransactionIds = (data) => {
     let currentId = 1001;
     return data.map(row => ({
@@ -69,10 +70,10 @@ const UltimateDataCleaningTool = () => {
     }));
   };
 
-  // ULTIMATE ACCOUNT NAME STANDARDIZATION - 42 variations mapped to 18 consistent names
+  // ULTIMATE ACCOUNT NAME STANDARDIZATION
   const standardizeAccountNames = (data) => {
     const accountMappings = {
-      // Salary/Wage variations - COMPREHENSIVE
+      // Salary/Wage variations
       'salary expense': 'Salary Expense',
       'wages expense': 'Salary Expense',
       'wages': 'Salary Expense',
@@ -80,23 +81,22 @@ const UltimateDataCleaningTool = () => {
       'salaries': 'Salary Expense',
       'wages exp': 'Salary Expense',
       
-      // Rent variations - COMPREHENSIVE
+      // Rent variations
       'rent expense': 'Rent Expense',
       'rent': 'Rent Expense',
-      'rent expense': 'Rent Expense',
       
-      // Insurance variations - COMPREHENSIVE
+      // Insurance variations
       'insurance expense': 'Insurance Expense',
       'insurance exp': 'Insurance Expense',
       'ins. expense': 'Insurance Expense',
       'insurance': 'Insurance Expense',
       'prepaid insurance': 'Prepaid Insurance',
       
-      // Utilities variations - COMPREHENSIVE
+      // Utilities variations
       'utilities expense': 'Utilities Expense',
       'utilities': 'Utilities Expense',
       
-      // Revenue variations - COMPREHENSIVE
+      // Revenue variations
       'rental revenue': 'Rental Revenue',
       'rental rev': 'Rental Revenue',
       'tour revenue': 'Tour Revenue',
@@ -104,24 +104,24 @@ const UltimateDataCleaningTool = () => {
       'sales rev': 'Sales Revenue',
       'event revenue': 'Event Revenue',
       
-      // Supplies variations - COMPREHENSIVE
+      // Supplies variations
       'office supplies': 'Office Supplies',
       'supplies': 'Supplies',
       
       // Equipment
       'equipment': 'Equipment',
       
-      // Marketing/Advertising - COMPREHENSIVE
+      // Marketing/Advertising
       'marketing expense': 'Marketing Expense',
       'marketing': 'Marketing Expense',
       'advertising': 'Advertising Expense',
       
-      // Maintenance/Repairs - COMPREHENSIVE
+      // Maintenance/Repairs
       'maintenance expense': 'Maintenance Expense',
       'maintenance': 'Maintenance Expense',
       'repairs': 'Maintenance Expense',
       
-      // Other expenses - COMPREHENSIVE
+      // Other expenses
       'license expense': 'License Expense',
       'training expense': 'Training Expense',
       'event expense': 'Event Expense',
@@ -135,15 +135,15 @@ const UltimateDataCleaningTool = () => {
     return data.map(row => ({
       ...row,
       Account: row.Account ? 
-        accountMappings[row.Account.toLowerCase().trim()] || row.Account : 
+        (accountMappings[row.Account.toLowerCase().trim()] || row.Account) : 
         row.Account
     }));
   };
 
-  // ULTIMATE PAYMENT METHOD STANDARDIZATION - 25 variations mapped to 10 consistent names
+  // ULTIMATE PAYMENT METHOD STANDARDIZATION
   const standardizePaymentMethods = (data) => {
     const paymentMappings = {
-      // Check variations - COMPREHENSIVE
+      // Check variations
       'check': 'Check',
       'check #101': 'Check',
       'check #102': 'Check',
@@ -161,87 +161,69 @@ const UltimateDataCleaningTool = () => {
       'check #120': 'Check',
       'check #121': 'Check',
       
-      // Wire transfer variations - COMPREHENSIVE
+      // Wire transfer variations
       'wire transfer': 'Wire Transfer',
       'wire': 'Wire Transfer',
       
-      // Credit card variations - COMPREHENSIVE
+      // Credit card variations
       'credit card': 'Credit Card',
       'credit cards': 'Credit Card',
       'cc': 'Credit Card',
       
-      // Direct deposit variations - COMPREHENSIVE
+      // Direct deposit variations
       'direct deposit': 'Direct Deposit',
       'dd': 'Direct Deposit',
       'direct dep': 'Direct Deposit',
       
-      // Cash variations - COMPREHENSIVE
+      // Cash variations
       'cash': 'Cash',
       
-      // Auto pay variations - COMPREHENSIVE
+      // Auto pay variations
       'auto pay': 'Auto Pay',
       'auto': 'Auto Pay',
       
-      // Online/Transfer variations - COMPREHENSIVE
+      // Online/Transfer variations
       'online': 'Online Payment',
       'transfer': 'Transfer',
       
-      // Mixed payments - COMPREHENSIVE
+      // Mixed payments
       'mixed': 'Mixed Payment Methods'
     };
     
     return data.map(row => ({
       ...row,
       Payment_Method: row.Payment_Method ? 
-        paymentMappings[row.Payment_Method.toLowerCase().trim()] || row.Payment_Method : 
+        (paymentMappings[row.Payment_Method.toLowerCase().trim()] || row.Payment_Method) : 
         row.Payment_Method
     }));
   };
 
-  // ULTIMATE VENDOR NAME STANDARDIZATION
+  // VENDOR NAME STANDARDIZATION
   const standardizeVendorNames = (data) => {
     const vendorMappings = {
-      // Mountain Mutual Insurance variations - COMPREHENSIVE
       'mountain mutual ins': 'Mountain Mutual Insurance',
       'mountain mutual': 'Mountain Mutual Insurance', 
       'mtn mutual': 'Mountain Mutual Insurance',
-      
-      // Valley Properties variations - COMPREHENSIVE
       'valley properties': 'Valley Properties',
       'valley props': 'Valley Properties',
-      
-      // Joe's Bike Shop variations - COMPREHENSIVE
       "joe's bike shop": "Joe's Bike Shop",
       "joe's bike": "Joe's Bike Shop",
-      
-      // Mountain Electric variations - COMPREHENSIVE
       'mountain electric': 'Mountain Electric',
       'mtn electric': 'Mountain Electric',
-      
-      // Outdoor Wholesale variations - COMPREHENSIVE
       'outdoor wholesale co': 'Outdoor Wholesale Co',
       'outdoor wholesale': 'Outdoor Wholesale Co',
-      
-      // Other vendors that need standardization
-      'vista print': 'VistaPrint',
-      
-      // Vendors that should stay as-is (no mapping needed):
-      // 'specialized dealer', 'whitewater supply', 'office depot', 
-      // 'best buy', 'square systems', 'walmart', 'target', 'costco',
-      // 'county clerk', 'j. harrison', 'm. thompson', 'valley times',
-      // 't. anderson', 'smith family', 'wilderness cert', etc.
+      'vista print': 'VistaPrint'
     };
     
     return data.map(row => ({
       ...row,
       Vendor_Customer: row.Vendor_Customer ? 
-        vendorMappings[row.Vendor_Customer.toLowerCase().trim()] || 
-        row.Vendor_Customer.trim() : 
+        (vendorMappings[row.Vendor_Customer.toLowerCase().trim()] || row.Vendor_Customer.trim()) : 
         row.Vendor_Customer
     }));
   };
 
-  // Missing data handler - improved to handle empty strings consistently
+  // Handle missing data
   const handleMissingData = (data) => {
     return data.map(row => {
       const cleanRow = {};
@@ -257,11 +239,10 @@ const UltimateDataCleaningTool = () => {
     });
   };
 
-  // Remove duplicate entries - improved to handle exact duplicates
+  // Remove duplicates
   const removeDuplicates = (data) => {
     const seen = new Set();
     return data.filter(row => {
-      // Create comprehensive key from all fields except Notes
       const key = `${row.Date}-${row.Trans_ID}-${row.Description}-${row.Amount}-${row.Account}-${row.Payment_Method}-${row.Vendor_Customer}`.toLowerCase();
       if (seen.has(key)) {
         return false;
@@ -271,7 +252,7 @@ const UltimateDataCleaningTool = () => {
     });
   };
 
-  // Text cleaner - improved to handle all text fields consistently
+  // Clean text
   const cleanText = (data) => {
     return data.map(row => {
       const cleanRow = {};
@@ -287,36 +268,7 @@ const UltimateDataCleaningTool = () => {
     });
   };
 
-  // VALIDATION: Check for data quality issues
-  const validateData = (data) => {
-    const issues = [];
-    
-    data.forEach((row, index) => {
-      // Check for missing dates
-      if (!row.Date || row.Date.trim() === '') {
-        issues.push(`Row ${index + 1}: Missing date`);
-      }
-      
-      // Check for missing amounts in expense/income rows
-      if ((row.Account && row.Account.toLowerCase().includes('expense')) || 
-          (row.Account && row.Account.toLowerCase().includes('revenue'))) {
-        if (!row.Amount || row.Amount.toString().trim() === '') {
-          issues.push(`Row ${index + 1}: Missing amount for ${row.Account}`);
-        }
-      }
-      
-      // Check for invalid amounts
-      if (row.Amount && row.Amount.toString().trim() !== '') {
-        const amount = parseFloat(row.Amount);
-        if (isNaN(amount)) {
-          issues.push(`Row ${index + 1}: Invalid amount "${row.Amount}"`);
-        }
-      }
-    });
-    
-    return issues;
-  };
-
+  // File upload handler
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -325,30 +277,33 @@ const UltimateDataCleaningTool = () => {
       header: true,
       skipEmptyLines: true,
       complete: (result) => {
+        console.log('Parsed data:', result.data);
         setOriginalData(result.data);
         setData(result.data);
         setResults(null);
+      },
+      error: (error) => {
+        console.error('Error parsing CSV:', error);
+        alert('Error parsing CSV file. Please check the file format.');
       }
     });
   };
 
+  // Main cleaning function
   const cleanData = () => {
+    if (data.length === 0) return;
+    
     let cleaned = [...originalData];
     let dateChanges = 0;
-    let idChanges = 0;
     let accountChanges = 0;
     let paymentChanges = 0;
     let vendorChanges = 0;
-    let missingDataFilled = 0;
     let duplicatesRemoved = 0;
-    let textCleaned = 0;
     
     const originalCount = cleaned.length;
     
-    // Step 1: Clean text (remove extra spaces, etc.)
-    const beforeTextClean = JSON.stringify(cleaned);
+    // Step 1: Clean text
     cleaned = cleanText(cleaned);
-    textCleaned = beforeTextClean !== JSON.stringify(cleaned) ? 1 : 0;
     
     // Step 2: Clean dates
     cleaned = cleaned.map(row => {
@@ -383,9 +338,7 @@ const UltimateDataCleaningTool = () => {
     });
     
     // Step 6: Handle missing data
-    const beforeMissingData = JSON.stringify(cleaned);
     cleaned = handleMissingData(cleaned);
-    missingDataFilled = beforeMissingData !== JSON.stringify(cleaned) ? 1 : 0;
     
     // Step 7: Remove duplicates
     cleaned = removeDuplicates(cleaned);
@@ -393,22 +346,14 @@ const UltimateDataCleaningTool = () => {
     
     // Step 8: Assign sequential transaction IDs
     cleaned = assignTransactionIds(cleaned);
-    idChanges = cleaned.length;
-    
-    // Step 9: Validate data
-    const validationIssues = validateData(cleaned);
     
     setData(cleaned);
     setResults({
       dateChanges,
-      idChanges,
       accountChanges,
       paymentChanges,
       vendorChanges,
-      missingDataFilled: missingDataFilled ? 'Yes' : 'No',
       duplicatesRemoved,
-      textCleaned: textCleaned ? 'Yes' : 'No',
-      validationIssues,
       totalRows: cleaned.length,
       originalRows: originalCount
     });
@@ -432,12 +377,11 @@ const UltimateDataCleaningTool = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Ultimate Financial Data Cleaning Tool</h1>
+      <h1 className="text-2xl font-bold mb-6">Financial Data Cleaning Tool</h1>
       
       {/* Upload Section */}
       <div className="bg-gray-50 p-4 rounded-lg mb-6">
@@ -448,7 +392,7 @@ const UltimateDataCleaningTool = () => {
           ref={fileInputRef}
           className="hidden"
         />
-        <div className="flex gap-4">
+        <div className="flex gap-4 flex-wrap">
           <button
             onClick={() => fileInputRef.current?.click()}
             className="bg-blue-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-600"
@@ -487,7 +431,7 @@ const UltimateDataCleaningTool = () => {
         
         {data.length > 0 && (
           <p className="text-sm text-gray-600 mt-2">
-            Loaded {data.length} rows from financial transactions
+            Loaded {data.length} transaction records
           </p>
         )}
       </div>
@@ -496,52 +440,31 @@ const UltimateDataCleaningTool = () => {
       {results && (
         <div className="bg-green-50 p-4 rounded-lg mb-6">
           <h3 className="font-semibold text-green-800 mb-2">Cleaning Complete!</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
             <span className="flex items-center gap-1">
               <Calendar size={14} />
               {results.dateChanges} dates standardized
             </span>
             <span className="flex items-center gap-1">
               <Hash size={14} />
-              {results.idChanges} IDs assigned
+              {results.totalRows} IDs assigned
             </span>
             <span className="flex items-center gap-1">
-              📊 {results.accountChanges} account names consolidated
+              📊 {results.accountChanges} accounts consolidated
             </span>
             <span className="flex items-center gap-1">
-              💳 {results.paymentChanges} payment methods standardized
+              💳 {results.paymentChanges} payments standardized
             </span>
             <span className="flex items-center gap-1">
-              🏪 {results.vendorChanges} vendor names standardized
-            </span>
-            <span className="flex items-center gap-1">
-              📝 Empty fields cleaned: {results.missingDataFilled}
+              🏪 {results.vendorChanges} vendors standardized
             </span>
             <span className="flex items-center gap-1">
               🗑️ {results.duplicatesRemoved} duplicates removed
-            </span>
-            <span className="flex items-center gap-1">
-              ✨ Text cleaned: {results.textCleaned}
             </span>
           </div>
           <div className="mt-2 text-xs text-gray-600">
             {results.originalRows} rows → {results.totalRows} rows (final)
           </div>
-          
-          {/* Validation Issues */}
-          {results.validationIssues.length > 0 && (
-            <div className="mt-4 bg-yellow-50 p-3 rounded">
-              <h4 className="font-semibold text-yellow-800 mb-1">Data Quality Issues Found:</h4>
-              <ul className="text-xs text-yellow-700 list-disc list-inside">
-                {results.validationIssues.slice(0, 5).map((issue, idx) => (
-                  <li key={idx}>{issue}</li>
-                ))}
-                {results.validationIssues.length > 5 && (
-                  <li>... and {results.validationIssues.length - 5} more issues</li>
-                )}
-              </ul>
-            </div>
-          )}
         </div>
       )}
 
@@ -560,7 +483,7 @@ const UltimateDataCleaningTool = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.slice(0, 15).map((row, idx) => (
+                {data.slice(0, 10).map((row, idx) => (
                   <tr key={idx} className="border-t even:bg-gray-50">
                     {Object.values(row).map((value, cellIdx) => (
                       <td key={cellIdx} className="px-2 py-1 truncate max-w-[120px]">
@@ -572,42 +495,22 @@ const UltimateDataCleaningTool = () => {
               </tbody>
             </table>
           </div>
-          {data.length > 15 && (
+          {data.length > 10 && (
             <div className="p-2 bg-gray-50 text-xs text-gray-600">
-              Showing first 15 of {data.length} rows
+              Showing first 10 of {data.length} rows
             </div>
           )}
         </div>
       )}
 
-      {/* Cleaning Summary */}
-      {data.length > 0 && (
-        <div className="mt-8 bg-blue-50 p-4 rounded-lg">
-          <h3 className="font-semibold mb-2">This Tool Specifically Handles:</h3>
-          <div className="text-sm grid grid-cols-1 md:grid-cols-2 gap-2">
-            <div>
-              <p className="font-medium">Account Names (42 → 18):</p>
-              <ul className="text-xs list-disc list-inside">
-                <li>Salary/Wages: 6 variations → "Salary Expense"</li>
-                <li>Rent: 3 variations → "Rent Expense"</li>
-                <li>Insurance: 5 variations → "Insurance Expense"</li>
-                <li>Revenue: 6 variations standardized</li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-medium">Payment Methods (25 → 10):</p>
-              <ul className="text-xs list-disc list-inside">
-                <li>All Check # variations → "Check"</li>
-                <li>DD/Direct Dep → "Direct Deposit"</li>
-                <li>CC → "Credit Card"</li>
-                <li>Auto/Auto Pay → "Auto Pay"</li>
-              </ul>
-            </div>
-          </div>
+      {data.length === 0 && (
+        <div className="text-center py-12 text-gray-500">
+          <Upload size={48} className="mx-auto mb-4 opacity-50" />
+          <p>Upload a CSV file to begin cleaning your financial data</p>
         </div>
       )}
     </div>
   );
 };
 
-export default UltimateDataCleaningTool;
+export default DataCleaningTool;
