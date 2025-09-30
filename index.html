@@ -3,63 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Data Cleaning Tool - Ultimate Edition</title>
+    <title>Data Cleaning Tool</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .dragover { background-color: #f0f9ff; border-color: #3b82f6; }
-        .fade-in { animation: fadeIn 0.5s ease-in; }
+        .dragover { background-color: #f8fafc; border-color: #3b82f6; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .account-salary { background-color: #f0f9ff !important; }
-        .account-rent { background-color: #f0fdf4 !important; }
-        .account-revenue { background-color: #fefce8 !important; }
+        .table-row:hover { background-color: #f8fafc; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="max-w-7xl mx-auto px-4 py-8">
+<body class="bg-white min-h-screen font-sans">
+    <div class="max-w-6xl mx-auto px-6 py-8">
         <!-- Header -->
         <header class="text-center mb-12">
-            <div class="flex items-center justify-center gap-3 mb-4">
-                <span class="text-4xl">🧹</span>
-                <h1 class="text-4xl font-bold text-gray-800">Financial Data Cleaner - Ultimate</h1>
-            </div>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Complete standardization of financial data. Fixes ALL inconsistencies found in your dataset.
-            </p>
+            <h1 class="text-3xl font-light text-gray-800 mb-2">Data Cleaning Tool</h1>
+            <p class="text-gray-600">Standardize and clean financial transaction data</p>
         </header>
 
         <!-- Main Tool -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
             <!-- Upload Area -->
-            <div id="upload-area" class="border-3 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
+            <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-gray-400">
                 <div class="text-gray-400 mb-4">
-                    <svg class="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
                 </div>
-                <p class="text-2xl font-semibold text-gray-700 mb-2">Upload Your Financial Data CSV</p>
-                <p class="text-gray-500 mb-4">Drag & drop your CSV file or click to browse</p>
+                <p class="text-lg font-medium text-gray-700 mb-2">Upload CSV File</p>
+                <p class="text-gray-500 text-sm">Drag and drop or click to browse</p>
                 <input type="file" id="file-input" accept=".csv" class="hidden">
             </div>
             
             <!-- Action Buttons -->
-            <div class="flex flex-wrap gap-4 mt-8 justify-center">
-                <button id="clean-btn" disabled class="bg-green-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 flex items-center gap-2 shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-wrap gap-3 mt-6 justify-center">
+                <button id="clean-btn" disabled class="bg-blue-600 text-white px-6 py-2.5 rounded font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    Clean & Standardize Data
+                    Process Data
                 </button>
                 
-                <button id="reset-btn" disabled class="bg-gray-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2">
-                    Reset to Original
+                <button id="reset-btn" disabled class="bg-gray-500 text-white px-6 py-2.5 rounded font-medium hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+                    Reset
                 </button>
                 
-                <button id="download-btn" disabled class="bg-purple-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 flex items-center gap-2 shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button id="download-btn" disabled class="bg-green-600 text-white px-6 py-2.5 rounded font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    Download Cleaned Data
+                    Export CSV
                 </button>
             </div>
 
@@ -69,56 +62,44 @@
             </div>
         </div>
 
-        <!-- Results -->
-        <div id="results" class="hidden bg-gradient-to-r from-green-50 to-emerald-100 border border-green-200 rounded-2xl p-6 mb-8 fade-in">
-            <h3 class="font-bold text-green-800 mb-4 text-xl flex items-center gap-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Data Completely Standardized!
-            </h3>
-            <div id="results-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
+        <!-- Processing Summary -->
+        <div id="results" class="hidden bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 fade-in">
+            <h3 class="font-medium text-gray-800 mb-4 text-lg">Processing Summary</h3>
+            <div id="results-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm"></div>
         </div>
 
         <!-- Data Preview -->
-        <div id="preview" class="hidden bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div class="bg-gray-800 text-white px-6 py-4">
-                <h3 class="text-lg font-semibold">Cleaned Data Preview</h3>
-                <p class="text-gray-300 text-sm">All inconsistencies have been resolved</p>
+        <div id="preview" class="hidden bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <h3 class="font-medium text-gray-800">Data Preview</h3>
+                <p class="text-gray-600 text-sm mt-1" id="preview-subtitle">Processed and standardized data</p>
             </div>
-            <div class="overflow-x-auto max-h-96">
+            <div class="overflow-x-auto">
                 <table id="preview-table" class="w-full text-sm">
-                    <thead class="bg-gray-100 sticky top-0">
-                        <tr id="table-headers"></tr>
+                    <thead class="bg-gray-50">
+                        <tr id="table-headers" class="border-b border-gray-200"></tr>
                     </thead>
-                    <tbody id="table-body" class="divide-y divide-gray-200"></tbody>
+                    <tbody id="table-body"></tbody>
                 </table>
             </div>
-            <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-600 border-t"></div>
-        </div>
-
-        <!-- Issues Fixed -->
-        <div id="issues-fixed" class="hidden mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6">
-            <h3 class="font-bold text-blue-800 mb-4 text-lg">Issues Fixed in Your Data:</h3>
-            <div id="issues-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"></div>
+            <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-500 border-t border-gray-200"></div>
         </div>
 
         <!-- Empty State -->
         <div id="empty-state" class="text-center py-16 text-gray-500">
-            <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
             </svg>
-            <p class="text-lg">Upload your financial CSV file to begin cleaning</p>
+            <p class="text-gray-600">Upload a CSV file to begin processing</p>
         </div>
     </div>
 
     <script>
-        // ========== GLOBAL VARIABLES ==========
+        // Global variables
         let originalData = [];
         let cleanedData = [];
-        let detectedIssues = [];
 
-        // ========== DOM ELEMENTS ==========
+        // DOM elements
         const elements = {
             uploadArea: document.getElementById('upload-area'),
             fileInput: document.getElementById('file-input'),
@@ -133,12 +114,10 @@
             emptyState: document.getElementById('empty-state'),
             tableHeaders: document.getElementById('table-headers'),
             tableBody: document.getElementById('table-body'),
-            previewFooter: document.getElementById('preview-footer'),
-            issuesFixed: document.getElementById('issues-fixed'),
-            issuesList: document.getElementById('issues-list')
+            previewFooter: document.getElementById('preview-footer')
         };
 
-        // ========== EVENT LISTENERS ==========
+        // Event listeners
         elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
         elements.uploadArea.addEventListener('dragover', handleDragOver);
         elements.uploadArea.addEventListener('dragleave', handleDragLeave);
@@ -148,7 +127,7 @@
         elements.resetBtn.addEventListener('click', resetData);
         elements.downloadBtn.addEventListener('click', downloadData);
 
-        // ========== DRAG AND DROP HANDLERS ==========
+        // Drag and drop handlers
         function handleDragOver(e) {
             e.preventDefault();
             elements.uploadArea.classList.add('dragover');
@@ -169,12 +148,12 @@
             }
         }
 
-        // ========== FILE HANDLING ==========
+        // File selection handler
         function handleFileSelect() {
             const file = elements.fileInput.files[0];
             if (!file) return;
 
-            elements.fileDetails.textContent = `File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            elements.fileDetails.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
             elements.fileInfo.classList.remove('hidden');
 
             Papa.parse(file, {
@@ -182,19 +161,15 @@
                 skipEmptyLines: true,
                 complete: function(results) {
                     if (results.errors.length > 0) {
-                        alert('Error parsing CSV: ' + results.errors[0].message);
+                        alert('Error reading file: ' + results.errors[0].message);
                         return;
                     }
                     
                     originalData = results.data;
                     cleanedData = [...originalData];
                     
-                    // Analyze data for issues
-                    analyzeDataIssues(originalData);
-                    
                     enableButtons();
                     showPreview(cleanedData);
-                    showDetectedIssues();
                 },
                 error: function(error) {
                     alert('Error reading file. Please check the file format.');
@@ -203,88 +178,30 @@
             });
         }
 
-        // ========== DATA ANALYSIS ==========
-        function analyzeDataIssues(data) {
-            detectedIssues = [];
-            const uniqueAccounts = new Set();
-            const uniquePayments = new Set();
-            const uniqueVendors = new Set();
-            const uniqueDates = new Set();
-            
-            data.forEach(row => {
-                if (row.Account) uniqueAccounts.add(row.Account);
-                if (row.Payment_Method) uniquePayments.add(row.Payment_Method);
-                if (row.Vendor_Customer) uniqueVendors.add(row.Vendor_Customer);
-                if (row.Date) uniqueDates.add(row.Date);
-            });
-
-            // Analyze account inconsistencies
-            const accountGroups = {
-                salary: Array.from(uniqueAccounts).filter(acc => 
-                    acc && acc.toLowerCase().includes('salary') || 
-                    acc.toLowerCase().includes('wage')
-                ),
-                rent: Array.from(uniqueAccounts).filter(acc => 
-                    acc && acc.toLowerCase().includes('rent')
-                ),
-                insurance: Array.from(uniqueAccounts).filter(acc => 
-                    acc && acc.toLowerCase().includes('insur')
-                ),
-                utilities: Array.from(uniqueAccounts).filter(acc => 
-                    acc && acc.toLowerCase().includes('util')
-                )
-            };
-
-            if (accountGroups.salary.length > 1) {
-                detectedIssues.push(`${accountGroups.salary.length} different salary/wage account names found`);
-            }
-            if (accountGroups.rent.length > 1) {
-                detectedIssues.push(`${accountGroups.rent.length} different rent account names found`);
-            }
-            if (accountGroups.insurance.length > 1) {
-                detectedIssues.push(`${accountGroups.insurance.length} different insurance account names found`);
-            }
-
-            // Count empty fields
-            const emptyAccounts = data.filter(row => !row.Account || row.Account.trim() === '').length;
-            const emptyDates = data.filter(row => !row.Date || row.Date.trim() === '').length;
-            const emptyIDs = data.filter(row => !row.Trans_ID || row.Trans_ID.trim() === '').length;
-
-            if (emptyAccounts > 0) detectedIssues.push(`${emptyAccounts} empty account fields`);
-            if (emptyDates > 0) detectedIssues.push(`${emptyDates} empty date fields`);
-            if (emptyIDs > 0) detectedIssues.push(`${emptyIDs} missing transaction IDs`);
-
-            detectedIssues.push(`${uniqueDates.size} different date formats`);
-            detectedIssues.push(`${uniquePayments.size} different payment methods`);
-        }
-
-        // ========== ULTIMATE CLEANING FUNCTIONS ==========
+        // Date standardization
         function standardizeDate(dateStr) {
             if (!dateStr || dateStr.trim() === '') return '';
             
             const cleaned = dateStr.toString().trim();
             
-            // Handle MM/DD/YYYY, MM-DD-YYYY, MM.DD.YYYY
-            const numberFormat = cleaned.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
-            if (numberFormat) {
-                let month = parseInt(numberFormat[1]);
-                let day = parseInt(numberFormat[2]);
-                let year = parseInt(numberFormat[3]);
+            // Handle number formats
+            const anyNumbers = cleaned.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+            if (anyNumbers) {
+                let num1 = parseInt(anyNumbers[1]);
+                let num2 = parseInt(anyNumbers[2]); 
+                let num3 = parseInt(anyNumbers[3]);
                 
-                // Handle 2-digit years
-                if (year < 100) {
-                    year = year < 50 ? 2000 + year : 1900 + year;
+                if (num1 > 31 || anyNumbers[1].length === 4) {
+                    return `${num2}/${num3}/${num1}`;
+                } else {
+                    if (num3 < 100) {
+                        num3 = num3 < 50 ? 2000 + num3 : 1900 + num3;
+                    }
+                    return `${num1}/${num2}/${num3}`;
                 }
-                
-                // Handle YYYY-MM-DD format (if month > 12, it's probably YYYY-MM-DD)
-                if (month > 12 && day <= 12) {
-                    [month, day] = [day, month]; // swap month and day
-                }
-                
-                return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
             }
             
-            // Handle text months: "Jan 3 2024", "January 3, 2024", "March 10"
+            // Handle text months
             const monthNames = {
                 jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3,
                 apr: 4, april: 4, may: 5, jun: 6, june: 6, jul: 7, july: 7,
@@ -292,50 +209,34 @@
                 nov: 11, november: 11, dec: 12, december: 12
             };
             
-            const textMatch = cleaned.match(/([a-zA-Z]+)\s+(\d{1,2}),?\s*(\d{4})?/);
-            if (textMatch) {
-                const monthName = textMatch[1].toLowerCase();
-                const day = parseInt(textMatch[2]);
-                const year = textMatch[3] || '2024';
-                
+            const textMonth = cleaned.match(/^(\w+)\s+(\d{1,2}),?\s*(\d{4})?$/);
+            if (textMonth) {
+                const monthName = textMonth[1].toLowerCase();
+                const day = parseInt(textMonth[2]);
+                const year = textMonth[3] || '2024';
                 if (monthNames[monthName]) {
-                    const month = monthNames[monthName];
-                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+                    return `${monthNames[monthName]}/${day}/${year}`;
                 }
             }
             
-            // Handle "7-Jan", "Feb 12" format
-            const dayMonthMatch = cleaned.match(/(\d{1,2})-([a-zA-Z]+)/);
-            if (dayMonthMatch) {
-                const day = parseInt(dayMonthMatch[1]);
-                const monthName = dayMonthMatch[2].toLowerCase();
+            const dayMonth = cleaned.match(/^(\d{1,2})-(\w+)$/);
+            if (dayMonth) {
+                const day = parseInt(dayMonth[1]);
+                const monthName = dayMonth[2].toLowerCase();
                 if (monthNames[monthName]) {
-                    const month = monthNames[monthName];
-                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/2024`;
+                    return `${monthNames[monthName]}/${day}/2024`;
                 }
             }
             
-            const monthDayMatch = cleaned.match(/([a-zA-Z]+)\s+(\d{1,2})$/);
-            if (monthDayMatch) {
-                const monthName = monthDayMatch[1].toLowerCase();
-                const day = parseInt(monthDayMatch[2]);
-                if (monthNames[monthName]) {
-                    const month = monthNames[monthName];
-                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/2024`;
-                }
-            }
-            
-            return cleaned; // Return original if no pattern matches
+            return cleaned;
         }
 
-        // COMPREHENSIVE ACCOUNT STANDARDIZATION
+        // Account name standardization
         function standardizeAccountName(account) {
-            if (!account || account.trim() === '') return '';
-            
-            const cleanAccount = account.toString().toLowerCase().trim();
+            if (!account) return '';
             
             const mappings = {
-                // SALARY/WAGES - ALL variations to "Salary Expense"
+                // Salary/Wage variations
                 'salary expense': 'Salary Expense',
                 'wages expense': 'Salary Expense',
                 'wages': 'Salary Expense',
@@ -343,23 +244,22 @@
                 'salaries': 'Salary Expense',
                 'wages exp': 'Salary Expense',
                 
-                // RENT - ALL variations to "Rent Expense"
+                // Rent variations
                 'rent expense': 'Rent Expense',
                 'rent': 'Rent Expense',
-                'rent expense': 'Rent Expense',
                 
-                // INSURANCE - ALL variations to "Insurance Expense" except Prepaid
+                // Insurance variations
                 'insurance expense': 'Insurance Expense',
                 'insurance exp': 'Insurance Expense',
                 'ins. expense': 'Insurance Expense',
                 'insurance': 'Insurance Expense',
                 'prepaid insurance': 'Prepaid Insurance',
                 
-                // UTILITIES - ALL variations to "Utilities Expense"
+                // Utilities variations
                 'utilities expense': 'Utilities Expense',
                 'utilities': 'Utilities Expense',
                 
-                // REVENUE - Standardize all revenue accounts
+                // Revenue variations
                 'rental revenue': 'Rental Revenue',
                 'rental rev': 'Rental Revenue',
                 'tour revenue': 'Tour Revenue',
@@ -367,47 +267,46 @@
                 'sales rev': 'Sales Revenue',
                 'event revenue': 'Event Revenue',
                 
-                // SUPPLIES - Distinguish between types
+                // Supplies variations
                 'office supplies': 'Office Supplies',
                 'supplies': 'Supplies',
                 'store supplies': 'Supplies',
                 
-                // EQUIPMENT
+                // Equipment
                 'equipment': 'Equipment',
                 
-                // MARKETING/ADVERTISING
+                // Marketing/Advertising
                 'marketing expense': 'Marketing Expense',
                 'marketing': 'Marketing Expense',
                 'advertising': 'Advertising Expense',
                 
-                // MAINTENANCE/REPAIRS - ALL to "Maintenance Expense"
+                // Maintenance/Repairs
                 'maintenance expense': 'Maintenance Expense',
                 'maintenance': 'Maintenance Expense',
                 'repairs': 'Maintenance Expense',
                 'equipment maintenance': 'Maintenance Expense',
                 
-                // OTHER EXPENSES
+                // Other expenses
                 'license expense': 'License Expense',
                 'training expense': 'Training Expense',
                 'event expense': 'Event Expense',
                 'storage expense': 'Storage Expense',
                 
-                // ASSETS
+                // Assets
                 'inventory': 'Inventory',
                 "owner's equity": "Owner's Equity"
             };
             
+            const cleanAccount = account.toString().toLowerCase().trim();
             return mappings[cleanAccount] || account;
         }
 
-        // COMPREHENSIVE PAYMENT METHOD STANDARDIZATION
+        // Payment method standardization
         function standardizePaymentMethod(payment) {
-            if (!payment || payment.trim() === '') return '';
-            
-            const cleanPayment = payment.toString().toLowerCase().trim();
+            if (!payment) return '';
             
             const mappings = {
-                // ALL check variations to "Check"
+                // Check variations
                 'check': 'Check',
                 'check #101': 'Check',
                 'check #102': 'Check',
@@ -425,7 +324,7 @@
                 'check #120': 'Check',
                 'check #121': 'Check',
                 
-                // Wire variations
+                // Wire transfer variations
                 'wire transfer': 'Wire Transfer',
                 'wire': 'Wire Transfer',
                 'transfer': 'Wire Transfer',
@@ -454,39 +353,34 @@
                 'mixed': 'Mixed Payment Methods'
             };
             
+            const cleanPayment = payment.toString().toLowerCase().trim();
             return mappings[cleanPayment] || payment;
         }
 
-        // COMPREHENSIVE VENDOR STANDARDIZATION
+        // Vendor name standardization
         function standardizeVendorName(vendor) {
-            if (!vendor || vendor.trim() === '') return '';
-            
-            const cleanVendor = vendor.toString().toLowerCase().trim();
+            if (!vendor) return '';
             
             const mappings = {
                 'mountain mutual ins': 'Mountain Mutual Insurance',
                 'mountain mutual': 'Mountain Mutual Insurance',
                 'mtn mutual': 'Mountain Mutual Insurance',
-                
                 'valley properties': 'Valley Properties',
                 'valley props': 'Valley Properties',
-                
                 "joe's bike shop": "Joe's Bike Shop",
                 "joe's bike": "Joe's Bike Shop",
-                
                 'mountain electric': 'Mountain Electric',
                 'mtn electric': 'Mountain Electric',
-                
                 'outdoor wholesale co': 'Outdoor Wholesale Co',
                 'outdoor wholesale': 'Outdoor Wholesale Co',
-                
                 'vista print': 'VistaPrint'
             };
             
+            const cleanVendor = vendor.toString().toLowerCase().trim();
             return mappings[cleanVendor] || vendor;
         }
 
-        // Remove duplicates based on comprehensive matching
+        // Remove duplicates
         function removeDuplicates(data) {
             const seen = new Set();
             return data.filter(row => {
@@ -499,7 +393,7 @@
             });
         }
 
-        // Assign sequential transaction IDs
+        // Assign transaction IDs
         function assignTransactionIds(data) {
             let currentId = 1001;
             return data.map(row => ({
@@ -524,7 +418,7 @@
             });
         }
 
-        // ========== MAIN CLEANING FUNCTION ==========
+        // Main processing function
         function cleanData() {
             if (originalData.length === 0) return;
             
@@ -534,13 +428,12 @@
                 accountChanges: 0,
                 paymentChanges: 0,
                 vendorChanges: 0,
-                duplicatesRemoved: 0,
-                emptyFieldsCleaned: 0
+                duplicatesRemoved: 0
             };
             
             const originalCount = cleaned.length;
             
-            // Step 1: Clean dates
+            // Process dates
             cleaned = cleaned.map(row => {
                 const originalDate = row.Date;
                 const cleanedDate = standardizeDate(originalDate);
@@ -548,7 +441,7 @@
                 return { ...row, Date: cleanedDate };
             });
             
-            // Step 2: Clean account names
+            // Process account names
             cleaned = cleaned.map(row => {
                 const originalAccount = row.Account;
                 const cleanedAccount = standardizeAccountName(originalAccount);
@@ -556,7 +449,7 @@
                 return { ...row, Account: cleanedAccount };
             });
             
-            // Step 3: Clean payment methods
+            // Process payment methods
             cleaned = cleaned.map(row => {
                 const originalPayment = row.Payment_Method;
                 const cleanedPayment = standardizePaymentMethod(originalPayment);
@@ -564,7 +457,7 @@
                 return { ...row, Payment_Method: cleanedPayment };
             });
             
-            // Step 4: Clean vendor names
+            // Process vendor names
             cleaned = cleaned.map(row => {
                 const originalVendor = row.Vendor_Customer;
                 const cleanedVendor = standardizeVendorName(originalVendor);
@@ -572,28 +465,27 @@
                 return { ...row, Vendor_Customer: cleanedVendor };
             });
             
-            // Step 5: Clean empty fields
+            // Clean empty fields
             cleaned = cleanEmptyFields(cleaned);
             
-            // Step 6: Remove duplicates
+            // Remove duplicates
             cleaned = removeDuplicates(cleaned);
             stats.duplicatesRemoved = originalCount - cleaned.length;
             
-            // Step 7: Assign sequential IDs
+            // Assign sequential IDs
             cleaned = assignTransactionIds(cleaned);
             
             cleanedData = cleaned;
             showResults(stats, originalCount, cleaned.length);
             showPreview(cleanedData);
             elements.downloadBtn.disabled = false;
-            
-            showNotification('All data inconsistencies have been resolved!', 'success');
         }
 
-        // ========== UI FUNCTIONS ==========
+        // UI functions
         function enableButtons() {
             elements.cleanBtn.disabled = false;
             elements.resetBtn.disabled = false;
+            elements.emptyState.style.display = 'none';
             elements.previewDiv.classList.remove('hidden');
         }
 
@@ -602,7 +494,6 @@
             elements.resultsDiv.classList.add('hidden');
             elements.downloadBtn.disabled = true;
             showPreview(cleanedData);
-            showNotification('Data reset to original', 'info');
         }
 
         function downloadData() {
@@ -611,11 +502,10 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.setAttribute('href', url);
-            link.setAttribute('download', `cleaned_financial_data_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `processed_data_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showNotification('Cleaned file downloaded successfully!', 'success');
         }
 
         function showPreview(data) {
@@ -627,114 +517,61 @@
             const headers = Object.keys(data[0]);
             headers.forEach(header => {
                 const th = document.createElement('th');
-                th.className = 'px-4 py-3 text-left font-semibold text-gray-700 bg-gray-100';
+                th.className = 'px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider';
                 th.textContent = header;
                 elements.tableHeaders.appendChild(th);
             });
             
-            data.slice(0, 20).forEach((row, index) => {
+            data.slice(0, 15).forEach((row, index) => {
                 const tr = document.createElement('tr');
-                
-                // Add color coding for account types
-                if (row.Account && row.Account.toLowerCase().includes('salary')) {
-                    tr.classList.add('account-salary');
-                } else if (row.Account && row.Account.toLowerCase().includes('rent')) {
-                    tr.classList.add('account-rent');
-                } else if (row.Account && row.Account.toLowerCase().includes('revenue')) {
-                    tr.classList.add('account-revenue');
-                }
+                tr.className = 'table-row border-b border-gray-100';
                 
                 headers.forEach(header => {
                     const td = document.createElement('td');
-                    td.className = 'px-4 py-2 border-t border-gray-200 text-gray-600 truncate max-w-[200px]';
+                    td.className = 'px-4 py-3 text-gray-600 text-sm';
                     td.textContent = row[header] || '';
                     tr.appendChild(td);
                 });
                 elements.tableBody.appendChild(tr);
             });
             
-            elements.previewFooter.textContent = data.length > 20 
-                ? `Showing first 20 of ${data.length} perfectly standardized records`
-                : `Showing all ${data.length} perfectly standardized records`;
+            elements.previewFooter.textContent = data.length > 15 
+                ? `Showing first 15 of ${data.length} records`
+                : `Showing all ${data.length} records`;
         }
 
         function showResults(stats, originalRows, totalRows) {
             elements.resultsStats.innerHTML = `
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-green-700 mb-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        <span class="font-semibold">${stats.dateChanges} dates standardized</span>
-                    </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Dates standardized</span>
+                    <span class="font-medium">${stats.dateChanges}</span>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-blue-700 mb-1">
-                        <span class="text-lg">📊</span>
-                        <span class="font-semibold">${stats.accountChanges} account names fixed</span>
-                    </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Accounts consolidated</span>
+                    <span class="font-medium">${stats.accountChanges}</span>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-purple-700 mb-1">
-                        <span class="text-lg">💳</span>
-                        <span class="font-semibold">${stats.paymentChanges} payment methods fixed</span>
-                    </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Payment methods standardized</span>
+                    <span class="font-medium">${stats.paymentChanges}</span>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-orange-700 mb-1">
-                        <span class="text-lg">🏪</span>
-                        <span class="font-semibold">${stats.vendorChanges} vendor names fixed</span>
-                    </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Vendors standardized</span>
+                    <span class="font-medium">${stats.vendorChanges}</span>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-red-700 mb-1">
-                        <span class="text-lg">🗑️</span>
-                        <span class="font-semibold">${stats.duplicatesRemoved} duplicates removed</span>
-                    </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Duplicates removed</span>
+                    <span class="font-medium">${stats.duplicatesRemoved}</span>
                 </div>
-                <div class="bg-white rounded-lg p-4 shadow-sm border">
-                    <div class="flex items-center gap-2 text-indigo-700 mb-1">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        <span class="font-semibold">${originalRows} → ${totalRows} records</span>
-                    </div>
+                <div class="flex items-center justify-between py-2">
+                    <span class="text-gray-600">Total records</span>
+                    <span class="font-medium">${originalRows} → ${totalRows}</span>
                 </div>
             `;
             elements.resultsDiv.classList.remove('hidden');
         }
 
-        function showDetectedIssues() {
-            if (detectedIssues.length === 0) return;
-            
-            elements.issuesList.innerHTML = detectedIssues.map(issue => 
-                `<div class="flex items-center gap-2 text-red-600">
-                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>${issue}</span>
-                </div>`
-            ).join('');
-            
-            elements.issuesFixed.classList.remove('hidden');
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white font-semibold z-50 transform transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500' : 'bg-blue-500'
-            }`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
         // Initialize
-        console.log('Ultimate Financial Data Cleaner initialized!');
+        console.log('Data Cleaning Tool initialized');
     </script>
 </body>
 </html>
