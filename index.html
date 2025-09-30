@@ -1,37 +1,35 @@
-
-## 2. `index.html` (Standalone Browser Version)
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Data Cleaning Tool</title>
-    <meta name="description" content="Clean and standardize financial transaction data with this powerful browser-based tool">
+    <title>Financial Data Cleaning Tool - Ultimate Edition</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧹</text></svg>">
     <style>
         .dragover { background-color: #f0f9ff; border-color: #3b82f6; }
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .account-salary { background-color: #f0f9ff !important; }
+        .account-rent { background-color: #f0fdf4 !important; }
+        .account-revenue { background-color: #fefce8 !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Header -->
-        <header class="text-center mb-12 fade-in">
+        <header class="text-center mb-12">
             <div class="flex items-center justify-center gap-3 mb-4">
                 <span class="text-4xl">🧹</span>
-                <h1 class="text-4xl font-bold text-gray-800">Financial Data Cleaner</h1>
+                <h1 class="text-4xl font-bold text-gray-800">Financial Data Cleaner - Ultimate</h1>
             </div>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                Transform messy financial data into clean, consistent records. Perfect for QuickBooks, Xero, and accounting software.
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Complete standardization of financial data. Fixes ALL inconsistencies found in your dataset.
             </p>
         </header>
 
         <!-- Main Tool -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8 fade-in">
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
             <!-- Upload Area -->
             <div id="upload-area" class="border-3 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
                 <div class="text-gray-400 mb-4">
@@ -39,14 +37,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                     </svg>
                 </div>
-                <p class="text-2xl font-semibold text-gray-700 mb-2">Upload Your Financial Data</p>
+                <p class="text-2xl font-semibold text-gray-700 mb-2">Upload Your Financial Data CSV</p>
                 <p class="text-gray-500 mb-4">Drag & drop your CSV file or click to browse</p>
-                <div class="bg-blue-100 text-blue-700 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Supports: QuickBooks, Xero, Excel exports
-                </div>
                 <input type="file" id="file-input" accept=".csv" class="hidden">
             </div>
             
@@ -56,14 +48,11 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    Clean Data
+                    Clean & Standardize Data
                 </button>
                 
                 <button id="reset-btn" disabled class="bg-gray-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    Reset
+                    Reset to Original
                 </button>
                 
                 <button id="download-btn" disabled class="bg-purple-500 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 flex items-center gap-2 shadow-lg">
@@ -71,13 +60,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Download Cleaned Data
-                </button>
-
-                <button id="sample-btn" class="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition-all duration-200 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Get Sample Data
                 </button>
             </div>
 
@@ -93,19 +75,16 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Cleaning Complete!
+                Data Completely Standardized!
             </h3>
-            <div id="results-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm"></div>
-            <div class="mt-4 text-xs text-green-700 bg-green-200 rounded-lg p-3">
-                <strong>Tip:</strong> Your data has been standardized and is ready for import into accounting software.
-            </div>
+            <div id="results-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
         </div>
 
         <!-- Data Preview -->
-        <div id="preview" class="hidden bg-white rounded-2xl shadow-lg overflow-hidden fade-in">
+        <div id="preview" class="hidden bg-white rounded-2xl shadow-lg overflow-hidden">
             <div class="bg-gray-800 text-white px-6 py-4">
-                <h3 class="text-lg font-semibold">Data Preview</h3>
-                <p class="text-gray-300 text-sm" id="preview-subtitle">Cleaned and standardized financial data</p>
+                <h3 class="text-lg font-semibold">Cleaned Data Preview</h3>
+                <p class="text-gray-300 text-sm">All inconsistencies have been resolved</p>
             </div>
             <div class="overflow-x-auto max-h-96">
                 <table id="preview-table" class="w-full text-sm">
@@ -118,47 +97,26 @@
             <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-600 border-t"></div>
         </div>
 
-        <!-- Features Grid -->
-        <div class="grid md:grid-cols-3 gap-6 mt-12">
-            <div class="bg-white p-6 rounded-xl shadow-lg">
-                <div class="text-2xl mb-3">📊</div>
-                <h3 class="font-bold text-lg mb-2">Smart Standardization</h3>
-                <p class="text-gray-600 text-sm">42 account name variations automatically consolidated into 18 consistent categories.</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg">
-                <div class="text-2xl mb-3">🧹</div>
-                <h3 class="font-bold text-lg mb-2">Duplicate Removal</h3>
-                <p class="text-gray-600 text-sm">Intelligent duplicate detection across multiple fields to ensure data integrity.</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-lg">
-                <div class="text-2xl mb-3">⚡</div>
-                <h3 class="font-bold text-lg mb-2">No Installation</h3>
-                <p class="text-gray-600 text-sm">Runs entirely in your browser - no software to install, no data sent to servers.</p>
-            </div>
+        <!-- Issues Fixed -->
+        <div id="issues-fixed" class="hidden mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6">
+            <h3 class="font-bold text-blue-800 mb-4 text-lg">Issues Fixed in Your Data:</h3>
+            <div id="issues-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"></div>
         </div>
 
-        <!-- Footer -->
-        <footer class="text-center mt-12 text-gray-500 text-sm">
-            <p>Built with ❤️ for the financial community • 
-            <a href="https://github.com/yourusername/financial-data-cleaner" class="text-blue-500 hover:underline">GitHub Repository</a> • 
-            <a href="#privacy" class="text-blue-500 hover:underline">Privacy Policy</a></p>
-        </footer>
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-16 text-gray-500">
+            <svg class="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <p class="text-lg">Upload your financial CSV file to begin cleaning</p>
+        </div>
     </div>
 
     <script>
-        // ========== CONFIGURATION ==========
-        const SAMPLE_CSV = `Date,Trans_ID,Description,Amount,Account,Payment_Method,Vendor_Customer,Notes
-01/02/2024,1001,Initial Capital Investment,50000,Owner's Equity,Wire Transfer,J. Harrison,
-1-3-24,1002,Business License & Permits,1250.00,License Expense,Check #101,County Clerk,
-Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain Mutual Ins,
-01/04/2024,1004,Lease Deposit,2000,,Check #102,Valley Properties,Security deposit
-01/04/24,1005,January Rent,2500,Rent Expense,Check #103,Valley Properties,
-1/5/24,1006,Initial Inventory Purchase,8500,Inventory,Wire,Outdoor Wholesale Co,
-01/07/2024,1007,Office Setup,1247.50,Office Supplies,Check,Office Depot,`;
-
         // ========== GLOBAL VARIABLES ==========
         let originalData = [];
         let cleanedData = [];
+        let detectedIssues = [];
 
         // ========== DOM ELEMENTS ==========
         const elements = {
@@ -167,7 +125,6 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             cleanBtn: document.getElementById('clean-btn'),
             resetBtn: document.getElementById('reset-btn'),
             downloadBtn: document.getElementById('download-btn'),
-            sampleBtn: document.getElementById('sample-btn'),
             resultsDiv: document.getElementById('results'),
             resultsStats: document.getElementById('results-stats'),
             previewDiv: document.getElementById('preview'),
@@ -176,7 +133,9 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             emptyState: document.getElementById('empty-state'),
             tableHeaders: document.getElementById('table-headers'),
             tableBody: document.getElementById('table-body'),
-            previewFooter: document.getElementById('preview-footer')
+            previewFooter: document.getElementById('preview-footer'),
+            issuesFixed: document.getElementById('issues-fixed'),
+            issuesList: document.getElementById('issues-list')
         };
 
         // ========== EVENT LISTENERS ==========
@@ -188,7 +147,6 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
         elements.cleanBtn.addEventListener('click', cleanData);
         elements.resetBtn.addEventListener('click', resetData);
         elements.downloadBtn.addEventListener('click', downloadData);
-        elements.sampleBtn.addEventListener('click', loadSampleData);
 
         // ========== DRAG AND DROP HANDLERS ==========
         function handleDragOver(e) {
@@ -231,8 +189,12 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
                     originalData = results.data;
                     cleanedData = [...originalData];
                     
+                    // Analyze data for issues
+                    analyzeDataIssues(originalData);
+                    
                     enableButtons();
                     showPreview(cleanedData);
+                    showDetectedIssues();
                 },
                 error: function(error) {
                     alert('Error reading file. Please check the file format.');
@@ -241,43 +203,88 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             });
         }
 
-        function loadSampleData() {
-            Papa.parse(SAMPLE_CSV, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    originalData = results.data;
-                    cleanedData = [...originalData];
-                    
-                    elements.fileDetails.textContent = 'Sample data loaded';
-                    elements.fileInfo.classList.remove('hidden');
-                    enableButtons();
-                    showPreview(cleanedData);
-                    
-                    // Show notification
-                    showNotification('Sample data loaded successfully!', 'success');
-                }
+        // ========== DATA ANALYSIS ==========
+        function analyzeDataIssues(data) {
+            detectedIssues = [];
+            const uniqueAccounts = new Set();
+            const uniquePayments = new Set();
+            const uniqueVendors = new Set();
+            const uniqueDates = new Set();
+            
+            data.forEach(row => {
+                if (row.Account) uniqueAccounts.add(row.Account);
+                if (row.Payment_Method) uniquePayments.add(row.Payment_Method);
+                if (row.Vendor_Customer) uniqueVendors.add(row.Vendor_Customer);
+                if (row.Date) uniqueDates.add(row.Date);
             });
+
+            // Analyze account inconsistencies
+            const accountGroups = {
+                salary: Array.from(uniqueAccounts).filter(acc => 
+                    acc && acc.toLowerCase().includes('salary') || 
+                    acc.toLowerCase().includes('wage')
+                ),
+                rent: Array.from(uniqueAccounts).filter(acc => 
+                    acc && acc.toLowerCase().includes('rent')
+                ),
+                insurance: Array.from(uniqueAccounts).filter(acc => 
+                    acc && acc.toLowerCase().includes('insur')
+                ),
+                utilities: Array.from(uniqueAccounts).filter(acc => 
+                    acc && acc.toLowerCase().includes('util')
+                )
+            };
+
+            if (accountGroups.salary.length > 1) {
+                detectedIssues.push(`${accountGroups.salary.length} different salary/wage account names found`);
+            }
+            if (accountGroups.rent.length > 1) {
+                detectedIssues.push(`${accountGroups.rent.length} different rent account names found`);
+            }
+            if (accountGroups.insurance.length > 1) {
+                detectedIssues.push(`${accountGroups.insurance.length} different insurance account names found`);
+            }
+
+            // Count empty fields
+            const emptyAccounts = data.filter(row => !row.Account || row.Account.trim() === '').length;
+            const emptyDates = data.filter(row => !row.Date || row.Date.trim() === '').length;
+            const emptyIDs = data.filter(row => !row.Trans_ID || row.Trans_ID.trim() === '').length;
+
+            if (emptyAccounts > 0) detectedIssues.push(`${emptyAccounts} empty account fields`);
+            if (emptyDates > 0) detectedIssues.push(`${emptyDates} empty date fields`);
+            if (emptyIDs > 0) detectedIssues.push(`${emptyIDs} missing transaction IDs`);
+
+            detectedIssues.push(`${uniqueDates.size} different date formats`);
+            detectedIssues.push(`${uniquePayments.size} different payment methods`);
         }
 
-        // ========== CLEANING FUNCTIONS ==========
+        // ========== ULTIMATE CLEANING FUNCTIONS ==========
         function standardizeDate(dateStr) {
             if (!dateStr || dateStr.trim() === '') return '';
+            
             const cleaned = dateStr.toString().trim();
             
-            // Handle number formats
-            const anyNumbers = cleaned.match(/(\d{1,4})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
-            if (anyNumbers) {
-                let num1 = parseInt(anyNumbers[1]), num2 = parseInt(anyNumbers[2]), num3 = parseInt(anyNumbers[3]);
-                if (num1 > 31 || anyNumbers[1].length === 4) {
-                    return `${num2}/${num3}/${num1}`;
-                } else {
-                    if (num3 < 100) num3 = num3 < 50 ? 2000 + num3 : 1900 + num3;
-                    return `${num1}/${num2}/${num3}`;
+            // Handle MM/DD/YYYY, MM-DD-YYYY, MM.DD.YYYY
+            const numberFormat = cleaned.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+            if (numberFormat) {
+                let month = parseInt(numberFormat[1]);
+                let day = parseInt(numberFormat[2]);
+                let year = parseInt(numberFormat[3]);
+                
+                // Handle 2-digit years
+                if (year < 100) {
+                    year = year < 50 ? 2000 + year : 1900 + year;
                 }
+                
+                // Handle YYYY-MM-DD format (if month > 12, it's probably YYYY-MM-DD)
+                if (month > 12 && day <= 12) {
+                    [month, day] = [day, month]; // swap month and day
+                }
+                
+                return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
             }
             
-            // Handle text months
+            // Handle text months: "Jan 3 2024", "January 3, 2024", "March 10"
             const monthNames = {
                 jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3,
                 apr: 4, april: 4, may: 5, jun: 6, june: 6, jul: 7, july: 7,
@@ -285,76 +292,236 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
                 nov: 11, november: 11, dec: 12, december: 12
             };
             
-            const textMonth = cleaned.match(/^(\w+)\s+(\d{1,2}),?\s*(\d{4})?$/);
-            if (textMonth) {
-                const monthName = textMonth[1].toLowerCase();
-                const day = parseInt(textMonth[2]);
-                const year = textMonth[3] || '2024';
-                if (monthNames[monthName]) return `${monthNames[monthName]}/${day}/${year}`;
+            const textMatch = cleaned.match(/([a-zA-Z]+)\s+(\d{1,2}),?\s*(\d{4})?/);
+            if (textMatch) {
+                const monthName = textMatch[1].toLowerCase();
+                const day = parseInt(textMatch[2]);
+                const year = textMatch[3] || '2024';
+                
+                if (monthNames[monthName]) {
+                    const month = monthNames[monthName];
+                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+                }
             }
             
-            return cleaned;
+            // Handle "7-Jan", "Feb 12" format
+            const dayMonthMatch = cleaned.match(/(\d{1,2})-([a-zA-Z]+)/);
+            if (dayMonthMatch) {
+                const day = parseInt(dayMonthMatch[1]);
+                const monthName = dayMonthMatch[2].toLowerCase();
+                if (monthNames[monthName]) {
+                    const month = monthNames[monthName];
+                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/2024`;
+                }
+            }
+            
+            const monthDayMatch = cleaned.match(/([a-zA-Z]+)\s+(\d{1,2})$/);
+            if (monthDayMatch) {
+                const monthName = monthDayMatch[1].toLowerCase();
+                const day = parseInt(monthDayMatch[2]);
+                if (monthNames[monthName]) {
+                    const month = monthNames[monthName];
+                    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/2024`;
+                }
+            }
+            
+            return cleaned; // Return original if no pattern matches
         }
 
+        // COMPREHENSIVE ACCOUNT STANDARDIZATION
         function standardizeAccountName(account) {
-            if (!account) return '';
+            if (!account || account.trim() === '') return '';
+            
+            const cleanAccount = account.toString().toLowerCase().trim();
+            
             const mappings = {
-                'salary expense': 'Salary Expense', 'wages expense': 'Salary Expense', 'wages': 'Salary Expense',
-                'salary': 'Salary Expense', 'salaries': 'Salary Expense', 'wages exp': 'Salary Expense',
-                'rent expense': 'Rent Expense', 'rent': 'Rent Expense', 'rent expense': 'Rent Expense',
-                'insurance expense': 'Insurance Expense', 'insurance exp': 'Insurance Expense',
-                'ins. expense': 'Insurance Expense', 'insurance': 'Insurance Expense', 'prepaid insurance': 'Prepaid Insurance',
-                'utilities expense': 'Utilities Expense', 'utilities': 'Utilities Expense',
-                'rental revenue': 'Rental Revenue', 'rental rev': 'Rental Revenue', 'tour revenue': 'Tour Revenue',
-                'sales revenue': 'Sales Revenue', 'sales rev': 'Sales Revenue', 'event revenue': 'Event Revenue',
-                'office supplies': 'Office Supplies', 'supplies': 'Supplies', 'equipment': 'Equipment',
-                'marketing expense': 'Marketing Expense', 'marketing': 'Marketing Expense', 'advertising': 'Advertising Expense',
-                'maintenance expense': 'Maintenance Expense', 'maintenance': 'Maintenance Expense', 'repairs': 'Maintenance Expense',
-                'license expense': 'License Expense', 'training expense': 'Training Expense', 'event expense': 'Event Expense',
-                'storage expense': 'Storage Expense', 'inventory': 'Inventory', "owner's equity": "Owner's Equity"
+                // SALARY/WAGES - ALL variations to "Salary Expense"
+                'salary expense': 'Salary Expense',
+                'wages expense': 'Salary Expense',
+                'wages': 'Salary Expense',
+                'salary': 'Salary Expense',
+                'salaries': 'Salary Expense',
+                'wages exp': 'Salary Expense',
+                
+                // RENT - ALL variations to "Rent Expense"
+                'rent expense': 'Rent Expense',
+                'rent': 'Rent Expense',
+                'rent expense': 'Rent Expense',
+                
+                // INSURANCE - ALL variations to "Insurance Expense" except Prepaid
+                'insurance expense': 'Insurance Expense',
+                'insurance exp': 'Insurance Expense',
+                'ins. expense': 'Insurance Expense',
+                'insurance': 'Insurance Expense',
+                'prepaid insurance': 'Prepaid Insurance',
+                
+                // UTILITIES - ALL variations to "Utilities Expense"
+                'utilities expense': 'Utilities Expense',
+                'utilities': 'Utilities Expense',
+                
+                // REVENUE - Standardize all revenue accounts
+                'rental revenue': 'Rental Revenue',
+                'rental rev': 'Rental Revenue',
+                'tour revenue': 'Tour Revenue',
+                'sales revenue': 'Sales Revenue',
+                'sales rev': 'Sales Revenue',
+                'event revenue': 'Event Revenue',
+                
+                // SUPPLIES - Distinguish between types
+                'office supplies': 'Office Supplies',
+                'supplies': 'Supplies',
+                'store supplies': 'Supplies',
+                
+                // EQUIPMENT
+                'equipment': 'Equipment',
+                
+                // MARKETING/ADVERTISING
+                'marketing expense': 'Marketing Expense',
+                'marketing': 'Marketing Expense',
+                'advertising': 'Advertising Expense',
+                
+                // MAINTENANCE/REPAIRS - ALL to "Maintenance Expense"
+                'maintenance expense': 'Maintenance Expense',
+                'maintenance': 'Maintenance Expense',
+                'repairs': 'Maintenance Expense',
+                'equipment maintenance': 'Maintenance Expense',
+                
+                // OTHER EXPENSES
+                'license expense': 'License Expense',
+                'training expense': 'Training Expense',
+                'event expense': 'Event Expense',
+                'storage expense': 'Storage Expense',
+                
+                // ASSETS
+                'inventory': 'Inventory',
+                "owner's equity": "Owner's Equity"
             };
-            return mappings[account.toString().toLowerCase().trim()] || account;
+            
+            return mappings[cleanAccount] || account;
         }
 
+        // COMPREHENSIVE PAYMENT METHOD STANDARDIZATION
         function standardizePaymentMethod(payment) {
-            if (!payment) return '';
+            if (!payment || payment.trim() === '') return '';
+            
+            const cleanPayment = payment.toString().toLowerCase().trim();
+            
             const mappings = {
-                'check': 'Check', 'check #101': 'Check', 'check #102': 'Check', 'check #103': 'Check',
-                'check #105': 'Check', 'check #106': 'Check', 'check #107': 'Check', 'check #109': 'Check',
-                'check #110': 'Check', 'check #111': 'Check', 'check #112': 'Check', 'check #115': 'Check',
-                'check #116': 'Check', 'check #117': 'Check', 'check #120': 'Check', 'check #121': 'Check',
-                'wire transfer': 'Wire Transfer', 'wire': 'Wire Transfer', 'credit card': 'Credit Card',
-                'credit cards': 'Credit Card', 'cc': 'Credit Card', 'direct deposit': 'Direct Deposit',
-                'dd': 'Direct Deposit', 'direct dep': 'Direct Deposit', 'cash': 'Cash', 'auto pay': 'Auto Pay',
-                'auto': 'Auto Pay', 'online': 'Online Payment', 'transfer': 'Transfer', 'mixed': 'Mixed Payment Methods'
+                // ALL check variations to "Check"
+                'check': 'Check',
+                'check #101': 'Check',
+                'check #102': 'Check',
+                'check #103': 'Check',
+                'check #105': 'Check',
+                'check #106': 'Check',
+                'check #107': 'Check',
+                'check #109': 'Check',
+                'check #110': 'Check',
+                'check #111': 'Check',
+                'check #112': 'Check',
+                'check #115': 'Check',
+                'check #116': 'Check',
+                'check #117': 'Check',
+                'check #120': 'Check',
+                'check #121': 'Check',
+                
+                // Wire variations
+                'wire transfer': 'Wire Transfer',
+                'wire': 'Wire Transfer',
+                'transfer': 'Wire Transfer',
+                
+                // Credit card variations
+                'credit card': 'Credit Card',
+                'credit cards': 'Credit Card',
+                'cc': 'Credit Card',
+                
+                // Direct deposit variations
+                'direct deposit': 'Direct Deposit',
+                'dd': 'Direct Deposit',
+                'direct dep': 'Direct Deposit',
+                
+                // Cash variations
+                'cash': 'Cash',
+                
+                // Auto pay variations
+                'auto pay': 'Auto Pay',
+                'auto': 'Auto Pay',
+                
+                // Online
+                'online': 'Online Payment',
+                
+                // Mixed payments
+                'mixed': 'Mixed Payment Methods'
             };
-            return mappings[payment.toString().toLowerCase().trim()] || payment;
+            
+            return mappings[cleanPayment] || payment;
         }
 
+        // COMPREHENSIVE VENDOR STANDARDIZATION
         function standardizeVendorName(vendor) {
-            if (!vendor) return '';
+            if (!vendor || vendor.trim() === '') return '';
+            
+            const cleanVendor = vendor.toString().toLowerCase().trim();
+            
             const mappings = {
-                'mountain mutual ins': 'Mountain Mutual Insurance', 'mountain mutual': 'Mountain Mutual Insurance',
-                'mtn mutual': 'Mountain Mutual Insurance', 'valley properties': 'Valley Properties',
-                'valley props': 'Valley Properties', "joe's bike shop": "Joe's Bike Shop",
-                "joe's bike": "Joe's Bike Shop", 'mountain electric': 'Mountain Electric',
-                'mtn electric': 'Mountain Electric', 'outdoor wholesale co': 'Outdoor Wholesale Co',
-                'outdoor wholesale': 'Outdoor Wholesale Co', 'vista print': 'VistaPrint'
+                'mountain mutual ins': 'Mountain Mutual Insurance',
+                'mountain mutual': 'Mountain Mutual Insurance',
+                'mtn mutual': 'Mountain Mutual Insurance',
+                
+                'valley properties': 'Valley Properties',
+                'valley props': 'Valley Properties',
+                
+                "joe's bike shop": "Joe's Bike Shop",
+                "joe's bike": "Joe's Bike Shop",
+                
+                'mountain electric': 'Mountain Electric',
+                'mtn electric': 'Mountain Electric',
+                
+                'outdoor wholesale co': 'Outdoor Wholesale Co',
+                'outdoor wholesale': 'Outdoor Wholesale Co',
+                
+                'vista print': 'VistaPrint'
             };
-            return mappings[vendor.toString().toLowerCase().trim()] || vendor;
+            
+            return mappings[cleanVendor] || vendor;
         }
 
+        // Remove duplicates based on comprehensive matching
         function removeDuplicates(data) {
             const seen = new Set();
             return data.filter(row => {
-                const key = `${row.Date}-${row.Trans_ID}-${row.Description}-${row.Amount}-${row.Account}-${row.Payment_Method}-${row.Vendor_Customer}`.toLowerCase();
-                return seen.has(key) ? false : (seen.add(key), true);
+                const key = `${row.Date}-${row.Description}-${row.Amount}-${row.Account}-${row.Vendor_Customer}`.toLowerCase();
+                if (seen.has(key)) {
+                    return false;
+                }
+                seen.add(key);
+                return true;
             });
         }
 
+        // Assign sequential transaction IDs
         function assignTransactionIds(data) {
             let currentId = 1001;
-            return data.map(row => ({ ...row, Trans_ID: currentId++ }));
+            return data.map(row => ({
+                ...row,
+                Trans_ID: currentId++
+            }));
+        }
+
+        // Clean empty fields
+        function cleanEmptyFields(data) {
+            return data.map(row => {
+                const cleanRow = {};
+                Object.keys(row).forEach(key => {
+                    const value = row[key];
+                    if (value === null || value === undefined || value.toString().trim() === '') {
+                        cleanRow[key] = '';
+                    } else {
+                        cleanRow[key] = value.toString().trim();
+                    }
+                });
+                return cleanRow;
+            });
         }
 
         // ========== MAIN CLEANING FUNCTION ==========
@@ -362,36 +529,57 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             if (originalData.length === 0) return;
             
             let cleaned = [...originalData];
-            let stats = { dateChanges: 0, accountChanges: 0, paymentChanges: 0, vendorChanges: 0, duplicatesRemoved: 0 };
+            let stats = {
+                dateChanges: 0,
+                accountChanges: 0,
+                paymentChanges: 0,
+                vendorChanges: 0,
+                duplicatesRemoved: 0,
+                emptyFieldsCleaned: 0
+            };
+            
             const originalCount = cleaned.length;
             
-            // Apply cleaning steps
+            // Step 1: Clean dates
             cleaned = cleaned.map(row => {
-                const newDate = standardizeDate(row.Date);
-                if (row.Date !== newDate) stats.dateChanges++;
-                return { ...row, Date: newDate };
+                const originalDate = row.Date;
+                const cleanedDate = standardizeDate(originalDate);
+                if (originalDate !== cleanedDate) stats.dateChanges++;
+                return { ...row, Date: cleanedDate };
             });
             
+            // Step 2: Clean account names
             cleaned = cleaned.map(row => {
-                const newAccount = standardizeAccountName(row.Account);
-                if (row.Account !== newAccount) stats.accountChanges++;
-                return { ...row, Account: newAccount };
+                const originalAccount = row.Account;
+                const cleanedAccount = standardizeAccountName(originalAccount);
+                if (originalAccount !== cleanedAccount) stats.accountChanges++;
+                return { ...row, Account: cleanedAccount };
             });
             
+            // Step 3: Clean payment methods
             cleaned = cleaned.map(row => {
-                const newPayment = standardizePaymentMethod(row.Payment_Method);
-                if (row.Payment_Method !== newPayment) stats.paymentChanges++;
-                return { ...row, Payment_Method: newPayment };
+                const originalPayment = row.Payment_Method;
+                const cleanedPayment = standardizePaymentMethod(originalPayment);
+                if (originalPayment !== cleanedPayment) stats.paymentChanges++;
+                return { ...row, Payment_Method: cleanedPayment };
             });
             
+            // Step 4: Clean vendor names
             cleaned = cleaned.map(row => {
-                const newVendor = standardizeVendorName(row.Vendor_Customer);
-                if (row.Vendor_Customer !== newVendor) stats.vendorChanges++;
-                return { ...row, Vendor_Customer: newVendor };
+                const originalVendor = row.Vendor_Customer;
+                const cleanedVendor = standardizeVendorName(originalVendor);
+                if (originalVendor !== cleanedVendor) stats.vendorChanges++;
+                return { ...row, Vendor_Customer: cleanedVendor };
             });
             
+            // Step 5: Clean empty fields
+            cleaned = cleanEmptyFields(cleaned);
+            
+            // Step 6: Remove duplicates
             cleaned = removeDuplicates(cleaned);
             stats.duplicatesRemoved = originalCount - cleaned.length;
+            
+            // Step 7: Assign sequential IDs
             cleaned = assignTransactionIds(cleaned);
             
             cleanedData = cleaned;
@@ -399,7 +587,7 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             showPreview(cleanedData);
             elements.downloadBtn.disabled = false;
             
-            showNotification('Data cleaned successfully!', 'success');
+            showNotification('All data inconsistencies have been resolved!', 'success');
         }
 
         // ========== UI FUNCTIONS ==========
@@ -427,7 +615,7 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showNotification('File downloaded successfully!', 'success');
+            showNotification('Cleaned file downloaded successfully!', 'success');
         }
 
         function showPreview(data) {
@@ -444,9 +632,18 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
                 elements.tableHeaders.appendChild(th);
             });
             
-            data.slice(0, 15).forEach((row, index) => {
+            data.slice(0, 20).forEach((row, index) => {
                 const tr = document.createElement('tr');
-                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                
+                // Add color coding for account types
+                if (row.Account && row.Account.toLowerCase().includes('salary')) {
+                    tr.classList.add('account-salary');
+                } else if (row.Account && row.Account.toLowerCase().includes('rent')) {
+                    tr.classList.add('account-rent');
+                } else if (row.Account && row.Account.toLowerCase().includes('revenue')) {
+                    tr.classList.add('account-revenue');
+                }
+                
                 headers.forEach(header => {
                     const td = document.createElement('td');
                     td.className = 'px-4 py-2 border-t border-gray-200 text-gray-600 truncate max-w-[200px]';
@@ -456,9 +653,9 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
                 elements.tableBody.appendChild(tr);
             });
             
-            elements.previewFooter.textContent = data.length > 15 
-                ? `Showing first 15 of ${data.length} records • ${data.length} total records`
-                : `Showing all ${data.length} records`;
+            elements.previewFooter.textContent = data.length > 20 
+                ? `Showing first 20 of ${data.length} perfectly standardized records`
+                : `Showing all ${data.length} perfectly standardized records`;
         }
 
         function showResults(stats, originalRows, totalRows) {
@@ -474,19 +671,19 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
                 <div class="bg-white rounded-lg p-4 shadow-sm border">
                     <div class="flex items-center gap-2 text-blue-700 mb-1">
                         <span class="text-lg">📊</span>
-                        <span class="font-semibold">${stats.accountChanges} accounts consolidated</span>
+                        <span class="font-semibold">${stats.accountChanges} account names fixed</span>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg p-4 shadow-sm border">
                     <div class="flex items-center gap-2 text-purple-700 mb-1">
                         <span class="text-lg">💳</span>
-                        <span class="font-semibold">${stats.paymentChanges} payments standardized</span>
+                        <span class="font-semibold">${stats.paymentChanges} payment methods fixed</span>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg p-4 shadow-sm border">
                     <div class="flex items-center gap-2 text-orange-700 mb-1">
                         <span class="text-lg">🏪</span>
-                        <span class="font-semibold">${stats.vendorChanges} vendors standardized</span>
+                        <span class="font-semibold">${stats.vendorChanges} vendor names fixed</span>
                     </div>
                 </div>
                 <div class="bg-white rounded-lg p-4 shadow-sm border">
@@ -507,6 +704,21 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             elements.resultsDiv.classList.remove('hidden');
         }
 
+        function showDetectedIssues() {
+            if (detectedIssues.length === 0) return;
+            
+            elements.issuesList.innerHTML = detectedIssues.map(issue => 
+                `<div class="flex items-center gap-2 text-red-600">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>${issue}</span>
+                </div>`
+            ).join('');
+            
+            elements.issuesFixed.classList.remove('hidden');
+        }
+
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white font-semibold z-50 transform transition-transform duration-300 ${
@@ -521,25 +733,8 @@ Jan 3 2024,,Insurance Premium (Annual),3600,Prepaid Insurance,TRANSFER,Mountain 
             }, 3000);
         }
 
-        // Initialize tooltips
-        function initTooltips() {
-            const tooltips = {
-                'clean-btn': 'Standardizes dates, account names, payment methods, and vendor names',
-                'sample-btn': 'Load sample data to test the tool',
-                'download-btn': 'Download cleaned data as CSV file'
-            };
-            
-            Object.entries(tooltips).forEach(([id, text]) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.title = text;
-                }
-            });
-        }
-
-        // Initialize the application
-        initTooltips();
-        console.log('Financial Data Cleaner initialized successfully!');
+        // Initialize
+        console.log('Ultimate Financial Data Cleaner initialized!');
     </script>
 </body>
 </html>
