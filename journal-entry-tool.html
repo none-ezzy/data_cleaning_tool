@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Journal Entry Tool</title>
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dragover { background-color: #f8fafc; border-color: #3b82f6; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .transaction-row:hover { background-color: #f8fafc; }
+        .categorized { background-color: #f0f9ff; }
+        .uncategorized { background-color: #fef2f2; }
+    </style>
+</head>
+<body class="bg-white min-h-screen font-sans">
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-3xl font-light text-gray-800 mb-2">Financial Journal Entry Tool</h1>
+            <p class="text-gray-600">Categorize and document financial transactions with journal entries</p>
+        </header>
+
+        <!-- Main Tool -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+            <!-- Upload Area -->
+            <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-gray-400">
+                <div class="text-gray-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <p class="text-lg font-medium text-gray-700 mb-2">Upload Cleaned Transaction CSV</p>
+                <p class="text-gray-500 text-sm">Drag and drop or click to browse</p>
+                <input type="file" id="file-input" accept=".csv" class="hidden">
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 mt-6 justify-center">
+                <button id="analyze-btn" disabled class="bg-purple-600 text-white px-6 py-2.5 rounded font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Analyze Transactions
+                </button>
+                
+                <button id="reset-btn" disabled class="bg-gray-500 text-white px-6 py-2.5 rounded font-medium hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+                    Reset
+                </button>
+                
+                <button id="export-btn" disabled class="bg-green-600 text-white px-6 py-2.5 rounded font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Export Journal Entries
+                </button>
+            </div>
+
+            <!-- File Info -->
+            <div id="file-info" class="hidden mt-4 text-center">
+                <p class="text-sm text-gray-600" id="file-details"></p>
+            </div>
+        </div>
+
+        <!-- Analysis Summary -->
+        <div id="results" class="hidden bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 fade-in">
+            <h3 class="font-medium text-gray-800 mb-4 text-lg">Transaction Analysis</h3>
+            <div id="results-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm"></div>
+        </div>
+
+        <!-- Journal Entry Interface -->
+        <div id="journal-interface" class="hidden bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <h3 class="font-medium text-gray-800">Transaction Journal</h3>
+                <p class="text-gray-600 text-sm mt-1">Categorize transactions and add journal entries</p>
+            </div>
+            
+            <!-- Filter Controls -->
+            <div class="bg-white px-6 py-4 border-b border-gray-200 flex flex-wrap gap-4 items-center">
+                <div>
+                    <label class="text-sm font-medium text-gray-700 mr-2">Filter by:</label>
+                    <select id="filter-type" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                        <option value="all">All Transactions</option>
+                        <option value="uncategorized">Uncategorized Only</option>
+                        <option value="categorized">Categorized Only</option>
+                        <option value="revenue">Revenue</option>
+                        <option value="expense">Expense</option>
+                        <option value="asset">Asset</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-gray-700 mr-2">Sort by:</label>
+                    <select id="sort-by" class="border border-gray-300 rounded px-3 py-1 text-sm">
+                        <option value="date">Date</option>
+                        <option value="amount">Amount</option>
+                        <option value="account">Account</option>
+                        <option value="vendor">Vendor</option>
+                    </select>
+                </div>
+                <div class="ml-auto">
+                    <span id="transaction-count" class="text-sm text-gray-600"></span>
+                </div>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="overflow-y-auto max-h-96">
+                <div id="transactions-list" class="divide-y divide-gray-200">
+                    <!-- Transactions will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Journal Entries Preview -->
+        <div id="preview" class="hidden bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <h3 class="font-medium text-gray-800">Journal Entries Preview</h3>
+                <p class="text-gray-600 text-sm mt-1">Formatted journal entries for accounting</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="preview-table" class="w-full text-sm">
+                    <thead class="bg-gray-50">
+                        <tr class="border-b border-gray-200">
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Account</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Debit</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Credit</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Description</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Category</th>
+                        </tr>
+                    </thead>
+                    <tbody id="journal-body"></tbody>
+                </table>
+            </div>
+            <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-500 border-t border-gray-200"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-16 text-gray-500">
+            <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+            </svg>
+            <p class="text-gray-600">Upload a cleaned CSV file to begin journal entry creation</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let originalData = [];
+        let journalData = [];
+        let categorizedTransactions = [];
+
+        // DOM elements
+        const elements = {
+            uploadArea: document.getElementById('upload-area'),
+            fileInput: document.getElementById('file-input'),
+            analyzeBtn: document.getElementById('analyze-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            exportBtn: document.getElementById('export-btn'),
+            resultsDiv: document.getElementById('results'),
+            resultsStats: document.getElementById('results-stats'),
+            journalInterface: document.getElementById('journal-interface'),
+            previewDiv: document.getElementById('preview'),
+            fileInfo: document.getElementById('file-info'),
+            fileDetails: document.getElementById('file-details'),
+            emptyState: document.getElementById('empty-state'),
+            transactionsList: document.getElementById('transactions-list'),
+            journalBody: document.getElementById('journal-body'),
+            previewFooter: document.getElementById('preview-footer'),
+            filterType: document.getElementById('filter-type'),
+            sortBy: document.getElementById('sort-by'),
+            transactionCount: document.getElementById('transaction-count')
+        };
+
+        // Event listeners
+        elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
+        elements.uploadArea.addEventListener('dragover', handleDragOver);
+        elements.uploadArea.addEventListener('dragleave', handleDragLeave);
+        elements.uploadArea.addEventListener('drop', handleDrop);
+        elements.fileInput.addEventListener('change', handleFileSelect);
+        elements.analyzeBtn.addEventListener('click', analyzeTransactions);
+        elements.resetBtn.addEventListener('click', resetData);
+        elements.exportBtn.addEventListener('click', exportJournal);
+        elements.filterType.addEventListener('change', filterTransactions);
+        elements.sortBy.addEventListener('change', filterTransactions);
+
+        // Drag and drop handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            elements.uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            elements.uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            elements.uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                elements.fileInput.files = files;
+                handleFileSelect();
+            }
+        }
+
+        // File selection handler
+        function handleFileSelect() {
+            const file = elements.fileInput.files[0];
+            if (!file) return;
+
+            elements.fileDetails.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            elements.fileInfo.classList.remove('hidden');
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (results.errors.length > 0) {
+                        alert('Error reading file: ' + results.errors[0].message);
+                        return;
+                    }
+                    
+                    originalData = results.data;
+                    enableButtons();
+                },
+                error: function(error) {
+                    alert('Error reading file. Please check the file format.');
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        // Predefined account categories based on your documentation
+        const accountCategories = {
+            // Assets
+            'Lease Deposit': 'Asset',
+            'Inventory': 'Asset',
+            'Prepaid Insurance': 'Asset',
+            'Equipment': 'Asset',
+            
+            // Expenses
+            'Salary Expense': 'Expense',
+            'Rent Expense': 'Expense', 
+            'Insurance Expense': 'Expense',
+            'Marketing Expense': 'Expense',
+            'Training Expense': 'Expense',
+            'Maintenance Expense': 'Expense',
+            'Utilities Expense': 'Expense',
+            
+            // Revenues
+            'Rental Revenue': 'Revenue',
+            'Tour Revenue': 'Revenue',
+            'Sales Revenue': 'Revenue'
+        };
+
+        // Analyze transactions and suggest categories
+        function analyzeTransactions() {
+            if (originalData.length === 0) return;
+            
+            let stats = {
+                total: originalData.length,
+                uncategorized: 0,
+                revenue: 0,
+                expense: 0,
+                asset: 0
+            };
+            
+            categorizedTransactions = originalData.map(transaction => {
+                let suggestedCategory = '';
+                let journalNote = '';
+                
+                // Analyze based on account name, description, amount, etc.
+                const account = transaction.Account || '';
+                const description = transaction.Description || '';
+                const vendor = transaction.Vendor_Customer || '';
+                const amount = parseFloat(transaction.Amount) || 0;
+                
+                // Determine category based on account name
+                if (accountCategories[account]) {
+                    suggestedCategory = accountCategories[account];
+                } 
+                // Heuristic categorization based on description/vendor
+                else if (description.toLowerCase().includes('rent') || vendor.toLowerCase().includes('valley propert')) {
+                    suggestedCategory = amount < 0 ? 'Expense' : 'Revenue';
+                    journalNote = amount < 0 ? 'Monthly rental expense' : 'Rental income';
+                }
+                else if (description.toLowerCase().includes('insurance') || vendor.toLowerCase().includes('mutual')) {
+                    suggestedCategory = 'Expense';
+                    journalNote = 'Insurance premium payment';
+                }
+                else if (description.toLowerCase().includes('salary') || description.toLowerCase().includes('payroll') || description.toLowerCase().includes('wage')) {
+                    suggestedCategory = 'Expense';
+                    journalNote = 'Employee compensation';
+                }
+                else if (description.toLowerCase().includes('bike') || description.toLowerCase().includes('kayak') || description.toLowerCase().includes('equipment')) {
+                    suggestedCategory = amount < 0 ? 'Asset' : 'Revenue';
+                    journalNote = amount < 0 ? 'Equipment purchase' : 'Equipment rental revenue';
+                }
+                else if (description.toLowerCase().includes('tour') || description.toLowerCase().includes('eco')) {
+                    suggestedCategory = 'Revenue';
+                    journalNote = 'Tour service revenue';
+                }
+                else if (description.toLowerCase().includes('market') || description.toLowerCase().includes('advertis')) {
+                    suggestedCategory = 'Expense';
+                    journalNote = 'Marketing and promotion';
+                }
+                
+                // Update stats
+                if (!suggestedCategory) stats.uncategorized++;
+                else if (suggestedCategory === 'Revenue') stats.revenue++;
+                else if (suggestedCategory === 'Expense') stats.expense++;
+                else if (suggestedCategory === 'Asset') stats.asset++;
+                
+                return {
+                    ...transaction,
+                    SuggestedCategory: suggestedCategory,
+                    FinalCategory: suggestedCategory,
+                    JournalNote: journalNote,
+                    IsCategorized: !!suggestedCategory
+                };
+            });
+            
+            showAnalysisResults(stats);
+            displayTransactions();
+            elements.exportBtn.disabled = false;
+        }
+
+        // Display transactions for categorization
+        function displayTransactions() {
+            elements.transactionsList.innerHTML = '';
+            
+            const filteredTransactions = filterAndSortTransactions(categorizedTransactions);
+            
+            filteredTransactions.forEach((transaction, index) => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = `transaction-row p-4 ${transaction.IsCategorized ? 'categorized' : 'uncategorized'}`;
+                
+                transactionEl.innerHTML = `
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex-1 min-w-64">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium text-gray-900">${transaction.Date || 'No date'}</span>
+                                <span class="text-xs px-2 py-1 rounded ${transaction.Amount < 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                                    $${Math.abs(transaction.Amount).toFixed(2)}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">${transaction.Description || 'No description'}</div>
+                            <div class="text-xs text-gray-500 mt-1">${transaction.Vendor_Customer || 'No vendor'}</div>
+                        </div>
+                        
+                        <div class="flex-1 min-w-48">
+                            <select class="category-select border border-gray-300 rounded px-3 py-1 text-sm w-full" data-index="${index}">
+                                <option value="">-- Select Category --</option>
+                                <option value="Asset" ${transaction.FinalCategory === 'Asset' ? 'selected' : ''}>Asset</option>
+                                <option value="Expense" ${transaction.FinalCategory === 'Expense' ? 'selected' : ''}>Expense</option>
+                                <option value="Revenue" ${transaction.FinalCategory === 'Revenue' ? 'selected' : ''}>Revenue</option>
+                                <option value="Liability" ${transaction.FinalCategory === 'Liability' ? 'selected' : ''}>Liability</option>
+                                <option value="Equity" ${transaction.FinalCategory === 'Equity' ? 'selected' : ''}>Equity</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex-1 min-w-64">
+                            <input type="text" class="journal-note border border-gray-300 rounded px-3 py-1 text-sm w-full" 
+                                   placeholder="Journal entry note..." value="${transaction.JournalNote || ''}" data-index="${index}">
+                        </div>
+                    </div>
+                `;
+                
+                elements.transactionsList.appendChild(transactionEl);
+            });
+            
+            // Add event listeners to the dynamically created elements
+            document.querySelectorAll('.category-select').forEach(select => {
+                select.addEventListener('change', updateTransactionCategory);
+            });
+            
+            document.querySelectorAll('.journal-note').forEach(input => {
+                input.addEventListener('input', updateTransactionNote);
+            });
+            
+            elements.transactionCount.textContent = `Showing ${filteredTransactions.length} of ${categorizedTransactions.length} transactions`;
+            updateJournalPreview();
+        }
+
+        // Update transaction category
+        function updateTransactionCategory(e) {
+            const index = parseInt(e.target.dataset.index);
+            const category = e.target.value;
+            
+            categorizedTransactions[index].FinalCategory = category;
+            categorizedTransactions[index].IsCategorized = !!category;
+            
+            // Update the row appearance
+            const row = e.target.closest('.transaction-row');
+            if (category) {
+                row.classList.remove('uncategorized');
+                row.classList.add('categorized');
+            } else {
+                row.classList.remove('categorized');
+                row.classList.add('uncategorized');
+            }
+            
+            updateJournalPreview();
+        }
+
+        // Update transaction journal note
+        function updateTransactionNote(e) {
+            const index = parseInt(e.target.dataset.index);
+            categorizedTransactions[index].JournalNote = e.target.value;
+            updateJournalPreview();
+        }
+
+        // Filter and sort transactions
+        function filterAndSortTransactions(transactions) {
+            let filtered = [...transactions];
+            const filterType = elements.filterType.value;
+            const sortBy = elements.sortBy.value;
+            
+            // Apply filter
+            if (filterType === 'uncategorized') {
+                filtered = filtered.filter(t => !t.IsCategorized);
+            } else if (filterType === 'categorized') {
+                filtered = filtered.filter(t => t.IsCategorized);
+            } else if (filterType === 'revenue') {
+                filtered = filtered.filter(t => t.FinalCategory === 'Revenue');
+            } else if (filterType === 'expense') {
+                filtered = filtered.filter(t => t.FinalCategory === 'Expense');
+            } else if (filterType === 'asset') {
+                filtered = filtered.filter(t => t.FinalCategory === 'Asset');
+            }
+            
+            // Apply sort
+            if (sortBy === 'date') {
+                filtered.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+            } else if (sortBy === 'amount') {
+                filtered.sort((a, b) => Math.abs(b.Amount) - Math.abs(a.Amount));
+            } else if (sortBy === 'account') {
+                filtered.sort((a, b) => (a.Account || '').localeCompare(b.Account || ''));
+            } else if (sortBy === 'vendor') {
+                filtered.sort((a, b) => (a.Vendor_Customer || '').localeCompare(b.Vendor_Customer || ''));
+            }
+            
+            return filtered;
+        }
+
+        // Filter transactions when filter changes
+        function filterTransactions() {
+            displayTransactions();
+        }
+
+        // Update journal preview
+        function updateJournalPreview() {
+            elements.journalBody.innerHTML = '';
+            
+            const journalEntries = generateJournalEntries();
+            
+            journalEntries.forEach(entry => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100';
+                
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Date}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Account}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Debit ? '$' + entry.Debit.toFixed(2) : ''}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Credit ? '$' + entry.Credit.toFixed(2) : ''}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Description}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm">
+                        <span class="px-2 py-1 rounded text-xs ${getCategoryColor(entry.Category)}">${entry.Category}</span>
+                    </td>
+                `;
+                
+                elements.journalBody.appendChild(tr);
+            });
+            
+            elements.previewFooter.textContent = `Generated ${journalEntries.length} journal entries`;
+        }
+
+        // Generate proper journal entries
+        function generateJournalEntries() {
+            const entries = [];
+            
+            categorizedTransactions.forEach(transaction => {
+                if (!transaction.FinalCategory) return;
+                
+                const amount = parseFloat(transaction.Amount) || 0;
+                const isNegative = amount < 0;
+                const absAmount = Math.abs(amount);
+                
+                // Create journal entry based on category
+                if (transaction.FinalCategory === 'Revenue') {
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: 'Cash',
+                        Debit: isNegative ? null : absAmount,
+                        Credit: isNegative ? absAmount : null,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Revenue'
+                    });
+                    
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: transaction.Account || 'Rental Revenue',
+                        Debit: isNegative ? absAmount : null,
+                        Credit: isNegative ? null : absAmount,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Revenue'
+                    });
+                }
+                else if (transaction.FinalCategory === 'Expense') {
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: transaction.Account || 'Various Expenses',
+                        Debit: isNegative ? absAmount : null,
+                        Credit: isNegative ? null : absAmount,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Expense'
+                    });
+                    
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: 'Cash',
+                        Debit: isNegative ? null : absAmount,
+                        Credit: isNegative ? absAmount : null,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Expense'
+                    });
+                }
+                else if (transaction.FinalCategory === 'Asset') {
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: transaction.Account || 'Equipment',
+                        Debit: isNegative ? absAmount : null,
+                        Credit: isNegative ? null : absAmount,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Asset'
+                    });
+                    
+                    entries.push({
+                        Date: transaction.Date,
+                        Account: 'Cash',
+                        Debit: isNegative ? null : absAmount,
+                        Credit: isNegative ? absAmount : null,
+                        Description: transaction.JournalNote || transaction.Description,
+                        Category: 'Asset'
+                    });
+                }
+            });
+            
+            return entries;
+        }
+
+        // Get color for category badge
+        function getCategoryColor(category) {
+            const colors = {
+                'Asset': 'bg-blue-100 text-blue-800',
+                'Expense': 'bg-red-100 text-red-800',
+                'Revenue': 'bg-green-100 text-green-800',
+                'Liability': 'bg-yellow-100 text-yellow-800',
+                'Equity': 'bg-purple-100 text-purple-800'
+            };
+            
+            return colors[category] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Show analysis results
+        function showAnalysisResults(stats) {
+            elements.resultsStats.innerHTML = `
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Total Transactions</span>
+                    <span class="font-medium">${stats.total}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Revenue Transactions</span>
+                    <span class="font-medium text-green-600">${stats.revenue}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Expense Transactions</span>
+                    <span class="font-medium text-red-600">${stats.expense}</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <span class="text-gray-600">Needs Categorization</span>
+                    <span class="font-medium text-orange-600">${stats.uncategorized}</span>
+                </div>
+            `;
+            
+            elements.resultsDiv.classList.remove('hidden');
+            elements.journalInterface.classList.remove('hidden');
+            elements.previewDiv.classList.remove('hidden');
+        }
+
+        // UI functions
+        function enableButtons() {
+            elements.analyzeBtn.disabled = false;
+            elements.resetBtn.disabled = false;
+            elements.emptyState.style.display = 'none';
+        }
+
+        function resetData() {
+            categorizedTransactions = [];
+            elements.resultsDiv.classList.add('hidden');
+            elements.journalInterface.classList.add('hidden');
+            elements.previewDiv.classList.add('hidden');
+            elements.exportBtn.disabled = true;
+        }
+
+        function exportJournal() {
+            const journalEntries = generateJournalEntries();
+            const csv = Papa.unparse(journalEntries);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `journal_entries_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize
+        console.log('Journal Entry Tool initialized');
+    </script>
+</body>
+</html>
