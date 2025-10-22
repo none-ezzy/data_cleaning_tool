@@ -573,5 +573,14 @@
         // Initialize
         console.log('Data Cleaning Tool initialized');
     </script>
+<!-- Add this before closing </body> tag -->
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="js/data-cleaning.js"></script>
+<script>
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initDataCleaningTool();
+    });
+</script>
 </body>
 </html>
