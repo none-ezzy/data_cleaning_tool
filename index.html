@@ -20,11 +20,12 @@
         <!-- Header -->
         <header class="text-center mb-16">
             <h1 class="text-4xl font-light text-gray-800 mb-4">Financial Data Tools</h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">A collection of web-based tools for financial data processing and analysis</p>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">A complete suite of web-based tools for financial data processing and accounting cycle automation</p>
         </header>
         
         <!-- Tools Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <!-- Data Cleaning Tool -->
             <a href="data-cleaning-tool.html" class="tool-card block p-8 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-200">
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,6 +42,7 @@
                 </span>
             </a>
             
+            <!-- Journal Entry Tool -->
             <a href="journal-entry-tool.html" class="tool-card block p-8 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-green-200">
                 <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +50,7 @@
                     </svg>
                 </div>
                 <h3 class="text-xl font-medium text-gray-900 mb-3">Journal Entry Tool</h3>
-                <p class="text-gray-600 mb-4">Categorize transactions and create proper double-entry accounting journal entries.</p>
+                <p class="text-gray-600 mb-4">Categorize transactions and create proper double-entry accounting journal entries with automatic debit/credit detection.</p>
                 <span class="text-green-600 font-medium inline-flex items-center">Open Tool 
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -56,50 +58,161 @@
                 </span>
             </a>
             
+            <!-- General Ledger Tool -->
+            <a href="general-ledger-tool.html" class="tool-card block p-8 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-purple-200">
+                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-3">General Ledger Tool</h3>
+                <p class="text-gray-600 mb-4">Create general ledger from journal entries with automatic accounting equation validation and balance checking.</p>
+                <span class="text-purple-600 font-medium inline-flex items-center">Open Tool 
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </span>
+            </a>
+            
+            <!-- Coming Soon Tools -->
             <div class="p-8 bg-gray-100 rounded-xl border border-gray-200">
                 <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
                     <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                     </svg>
                 </div>
-                <h3 class="text-xl font-medium text-gray-900 mb-3">More Tools Coming</h3>
-                <p class="text-gray-600 mb-4">Financial reporting, analytics, and visualization tools are in development.</p>
+                <h3 class="text-xl font-medium text-gray-900 mb-3">Financial Statements</h3>
+                <p class="text-gray-600 mb-4">Income statement, balance sheet, cash flow statement, and trial balance generation.</p>
+                <span class="text-gray-500 font-medium">Coming Soon</span>
+            </div>
+            
+            <div class="p-8 bg-gray-100 rounded-xl border border-gray-200">
+                <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-3">Ratio Analysis</h3>
+                <p class="text-gray-600 mb-4">Financial ratio calculations and comparison to industry benchmarks.</p>
+                <span class="text-gray-500 font-medium">Coming Soon</span>
+            </div>
+            
+            <div class="p-8 bg-gray-100 rounded-xl border border-gray-200">
+                <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-medium text-gray-900 mb-3">Advanced Analytics</h3>
+                <p class="text-gray-600 mb-4">Trend analysis, seasonal patterns, and financial forecasting.</p>
                 <span class="text-gray-500 font-medium">Coming Soon</span>
             </div>
         </div>
 
-        <!-- Features Section -->
-        <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
-            <h2 class="text-2xl font-light text-gray-800 mb-8 text-center">How It Works</h2>
-            <div class="grid md:grid-cols-3 gap-8">
+        <!-- Workflow Section -->
+        <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200 mb-8">
+            <h2 class="text-2xl font-light text-gray-800 mb-8 text-center">Complete Accounting Workflow</h2>
+            <div class="grid md:grid-cols-4 gap-6">
                 <div class="text-center">
                     <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span class="text-blue-600 font-bold text-xl">1</span>
                     </div>
-                    <h3 class="font-medium text-gray-900 mb-2">Upload CSV</h3>
-                    <p class="text-gray-600 text-sm">Drag and drop your financial transaction CSV files</p>
+                    <h3 class="font-medium text-gray-900 mb-2">Clean Data</h3>
+                    <p class="text-gray-600 text-sm">Upload and standardize transaction data</p>
+                    <a href="data-cleaning-tool.html" class="text-blue-600 text-xs mt-2 inline-block">Use Tool →</a>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span class="text-green-600 font-bold text-xl">2</span>
                     </div>
-                    <h3 class="font-medium text-gray-900 mb-2">Process Data</h3>
-                    <p class="text-gray-600 text-sm">Use our tools to clean, categorize, and analyze</p>
+                    <h3 class="font-medium text-gray-900 mb-2">Journal Entries</h3>
+                    <p class="text-gray-600 text-sm">Categorize transactions and determine debit/credit</p>
+                    <a href="journal-entry-tool.html" class="text-green-600 text-xs mt-2 inline-block">Use Tool →</a>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span class="text-purple-600 font-bold text-xl">3</span>
                     </div>
-                    <h3 class="font-medium text-gray-900 mb-2">Export Results</h3>
-                    <p class="text-gray-600 text-sm">Download processed data for accounting systems</p>
+                    <h3 class="font-medium text-gray-900 mb-2">General Ledger</h3>
+                    <p class="text-gray-600 text-sm">Post to accounts and validate accounting equation</p>
+                    <a href="general-ledger-tool.html" class="text-purple-600 text-xs mt-2 inline-block">Use Tool →</a>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-orange-600 font-bold text-xl">4</span>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Financial Reports</h3>
+                    <p class="text-gray-600 text-sm">Generate statements and analyze performance</p>
+                    <span class="text-orange-600 text-xs mt-2 inline-block">Coming Soon</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+            <h2 class="text-2xl font-light text-gray-800 mb-8 text-center">Key Features</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Fast Processing</h3>
+                    <p class="text-gray-600 text-sm">Process thousands of transactions in seconds</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Accounting Rules</h3>
+                    <p class="text-gray-600 text-sm">Automatic debit/credit detection using GAAP principles</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Data Privacy</h3>
+                    <p class="text-gray-600 text-sm">All processing happens in your browser - no data stored</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Export Ready</h3>
+                    <p class="text-gray-600 text-sm">CSV exports formatted for Google Sheets and Excel</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Smart Automation</h3>
+                    <p class="text-gray-600 text-sm">AI-powered categorization and error detection</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-indigo-50 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-gray-900 mb-2">Mobile Friendly</h3>
+                    <p class="text-gray-600 text-sm">Works perfectly on desktop, tablet, and mobile</p>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
         <footer class="text-center mt-16 pt-8 border-t border-gray-200">
-            <p class="text-gray-600">Open source financial tools • No data stored • Runs entirely in your browser</p>
-            <p class="text-gray-500 text-sm mt-2">Hosted on GitHub Pages</p>
+            <p class="text-gray-600">Complete Accounting Cycle Tools • No Data Stored • Runs Entirely in Your Browser</p>
+            <p class="text-gray-500 text-sm mt-2">Built for Academic Use • Compatible with Google Sheets</p>
         </footer>
     </div>
 </body>
