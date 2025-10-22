@@ -764,5 +764,14 @@
         // Initialize
         console.log('Journal Entry Tool initialized');
     </script>
+<!-- Add this before closing </body> tag -->
+<script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="js/journal-entry.js"></script>
+<script>
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initJournalEntryTool();
+    });
+</script>
 </body>
 </html>
