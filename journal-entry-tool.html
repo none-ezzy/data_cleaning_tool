@@ -13,6 +13,8 @@
         .transaction-row:hover { background-color: #f8fafc; }
         .categorized { background-color: #f0f9ff; }
         .uncategorized { background-color: #fef2f2; }
+        .debit { border-left: 4px solid #ef4444; }
+        .credit { border-left: 4px solid #10b981; }
     </style>
 </head>
 <body class="bg-white min-h-screen font-sans">
@@ -20,7 +22,7 @@
         <!-- Header -->
         <header class="text-center mb-12">
             <h1 class="text-3xl font-light text-gray-800 mb-2">Financial Journal Entry Tool</h1>
-            <p class="text-gray-600">Categorize and document financial transactions with journal entries</p>
+            <p class="text-gray-600">Automatically categorize transactions and determine debit/credit entries</p>
         </header>
 
         <!-- Main Tool -->
@@ -64,6 +66,33 @@
             </div>
         </div>
 
+        <!-- Accounting Rules Info -->
+        <div id="rules-info" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h3 class="font-medium text-blue-800 mb-3 text-lg">Accounting Rules Applied</h3>
+            <div class="grid md:grid-cols-2 gap-6 text-sm">
+                <div>
+                    <h4 class="font-medium text-blue-700 mb-2">Debit Rules (Left Side)</h4>
+                    <ul class="text-blue-600 space-y-1">
+                        <li>• Increase in Assets</li>
+                        <li>• Increase in Expenses</li>
+                        <li>• Decrease in Liabilities</li>
+                        <li>• Decrease in Equity</li>
+                        <li>• Decrease in Revenue</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-medium text-blue-700 mb-2">Credit Rules (Right Side)</h4>
+                    <ul class="text-blue-600 space-y-1">
+                        <li>• Decrease in Assets</li>
+                        <li>• Decrease in Expenses</li>
+                        <li>• Increase in Liabilities</li>
+                        <li>• Increase in Equity</li>
+                        <li>• Increase in Revenue</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- Analysis Summary -->
         <div id="results" class="hidden bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 fade-in">
             <h3 class="font-medium text-gray-800 mb-4 text-lg">Transaction Analysis</h3>
@@ -74,7 +103,7 @@
         <div id="journal-interface" class="hidden bg-white border border-gray-200 rounded-lg overflow-hidden mb-8">
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <h3 class="font-medium text-gray-800">Transaction Journal</h3>
-                <p class="text-gray-600 text-sm mt-1">Categorize transactions and add journal entries</p>
+                <p class="text-gray-600 text-sm mt-1">Categorize transactions - debit/credit will be auto-determined</p>
             </div>
             
             <!-- Filter Controls -->
@@ -88,6 +117,8 @@
                         <option value="revenue">Revenue</option>
                         <option value="expense">Expense</option>
                         <option value="asset">Asset</option>
+                        <option value="liability">Liability</option>
+                        <option value="equity">Equity</option>
                     </select>
                 </div>
                 <div>
@@ -115,8 +146,20 @@
         <!-- Journal Entries Preview -->
         <div id="preview" class="hidden bg-white border border-gray-200 rounded-lg overflow-hidden">
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <h3 class="font-medium text-gray-800">Journal Entries Preview</h3>
-                <p class="text-gray-600 text-sm mt-1">Formatted journal entries for accounting</p>
+                <div class="flex justify-between items-center">
+                    <h3 class="font-medium text-gray-800">Double-Entry Journal Preview</h3>
+                    <div class="flex gap-4 text-sm">
+                        <div class="flex items-center gap-1">
+                            <div class="w-3 h-3 bg-red-500 rounded"></div>
+                            <span class="text-gray-600">Debit</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <div class="w-3 h-3 bg-green-500 rounded"></div>
+                            <span class="text-gray-600">Credit</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600 text-sm mt-1">Automatically generated double-entry accounting entries</p>
             </div>
             <div class="overflow-x-auto">
                 <table id="preview-table" class="w-full text-sm">
@@ -127,13 +170,16 @@
                             <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Debit</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Credit</th>
                             <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Description</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Category</th>
+                            <th class="px-4 py-3 text-left font-medium text-gray-700 text-xs uppercase tracking-wider">Type</th>
                         </tr>
                     </thead>
                     <tbody id="journal-body"></tbody>
                 </table>
             </div>
-            <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-500 border-t border-gray-200"></div>
+            <div id="preview-footer" class="bg-gray-50 px-6 py-3 text-xs text-gray-500 border-t border-gray-200 flex justify-between items-center">
+                <span id="entries-count"></span>
+                <span id="balance-check" class="font-medium"></span>
+            </div>
         </div>
 
         <!-- Empty State -->
@@ -170,7 +216,10 @@
             previewFooter: document.getElementById('preview-footer'),
             filterType: document.getElementById('filter-type'),
             sortBy: document.getElementById('sort-by'),
-            transactionCount: document.getElementById('transaction-count')
+            transactionCount: document.getElementById('transaction-count'),
+            rulesInfo: document.getElementById('rules-info'),
+            entriesCount: document.getElementById('entries-count'),
+            balanceCheck: document.getElementById('balance-check')
         };
 
         // Event listeners
@@ -184,6 +233,60 @@
         elements.exportBtn.addEventListener('click', exportJournal);
         elements.filterType.addEventListener('change', filterTransactions);
         elements.sortBy.addEventListener('change', filterTransactions);
+
+        // Accounting rules for debit/credit determination
+        const accountingRules = {
+            // Assets: Increase = Debit, Decrease = Credit
+            'Asset': (amount) => amount < 0 ? 'credit' : 'debit',
+            
+            // Liabilities: Increase = Credit, Decrease = Debit
+            'Liability': (amount) => amount < 0 ? 'debit' : 'credit',
+            
+            // Equity: Increase = Credit, Decrease = Debit
+            'Equity': (amount) => amount < 0 ? 'debit' : 'credit',
+            
+            // Revenue: Increase = Credit, Decrease = Debit
+            'Revenue': (amount) => amount < 0 ? 'debit' : 'credit',
+            
+            // Expenses: Increase = Debit, Decrease = Credit
+            'Expense': (amount) => amount < 0 ? 'credit' : 'debit'
+        };
+
+        // Account type mappings
+        const accountTypes = {
+            // Assets
+            'Lease Deposit': 'Asset',
+            'Inventory': 'Asset',
+            'Prepaid Insurance': 'Asset',
+            'Equipment': 'Asset',
+            'Cash': 'Asset',
+            'Accounts Receivable': 'Asset',
+            
+            // Liabilities
+            'Accounts Payable': 'Liability',
+            'Loans Payable': 'Liability',
+            
+            // Equity
+            "Owner's Equity": 'Equity',
+            'Retained Earnings': 'Equity',
+            
+            // Revenue
+            'Rental Revenue': 'Revenue',
+            'Tour Revenue': 'Revenue',
+            'Sales Revenue': 'Revenue',
+            'Service Revenue': 'Revenue',
+            
+            // Expenses
+            'Salary Expense': 'Expense',
+            'Rent Expense': 'Expense', 
+            'Insurance Expense': 'Expense',
+            'Marketing Expense': 'Expense',
+            'Training Expense': 'Expense',
+            'Maintenance Expense': 'Expense',
+            'Utilities Expense': 'Expense',
+            'Supplies Expense': 'Expense',
+            'Depreciation Expense': 'Expense'
+        };
 
         // Drag and drop handlers
         function handleDragOver(e) {
@@ -233,29 +336,6 @@
             });
         }
 
-        // Predefined account categories based on your documentation
-        const accountCategories = {
-            // Assets
-            'Lease Deposit': 'Asset',
-            'Inventory': 'Asset',
-            'Prepaid Insurance': 'Asset',
-            'Equipment': 'Asset',
-            
-            // Expenses
-            'Salary Expense': 'Expense',
-            'Rent Expense': 'Expense', 
-            'Insurance Expense': 'Expense',
-            'Marketing Expense': 'Expense',
-            'Training Expense': 'Expense',
-            'Maintenance Expense': 'Expense',
-            'Utilities Expense': 'Expense',
-            
-            // Revenues
-            'Rental Revenue': 'Revenue',
-            'Tour Revenue': 'Revenue',
-            'Sales Revenue': 'Revenue'
-        };
-
         // Analyze transactions and suggest categories
         function analyzeTransactions() {
             if (originalData.length === 0) return;
@@ -265,11 +345,14 @@
                 uncategorized: 0,
                 revenue: 0,
                 expense: 0,
-                asset: 0
+                asset: 0,
+                liability: 0,
+                equity: 0
             };
             
             categorizedTransactions = originalData.map(transaction => {
                 let suggestedCategory = '';
+                let accountType = '';
                 let journalNote = '';
                 
                 // Analyze based on account name, description, amount, etc.
@@ -279,33 +362,51 @@
                 const amount = parseFloat(transaction.Amount) || 0;
                 
                 // Determine category based on account name
-                if (accountCategories[account]) {
-                    suggestedCategory = accountCategories[account];
+                if (accountTypes[account]) {
+                    suggestedCategory = accountTypes[account];
+                    accountType = suggestedCategory;
                 } 
                 // Heuristic categorization based on description/vendor
                 else if (description.toLowerCase().includes('rent') || vendor.toLowerCase().includes('valley propert')) {
                     suggestedCategory = amount < 0 ? 'Expense' : 'Revenue';
+                    accountType = suggestedCategory;
                     journalNote = amount < 0 ? 'Monthly rental expense' : 'Rental income';
                 }
                 else if (description.toLowerCase().includes('insurance') || vendor.toLowerCase().includes('mutual')) {
-                    suggestedCategory = 'Expense';
-                    journalNote = 'Insurance premium payment';
+                    suggestedCategory = amount < 0 ? 'Asset' : 'Expense'; // Prepaid vs Expense
+                    accountType = suggestedCategory;
+                    journalNote = amount < 0 ? 'Insurance premium payment' : 'Insurance expense recognition';
                 }
                 else if (description.toLowerCase().includes('salary') || description.toLowerCase().includes('payroll') || description.toLowerCase().includes('wage')) {
                     suggestedCategory = 'Expense';
+                    accountType = 'Expense';
                     journalNote = 'Employee compensation';
                 }
                 else if (description.toLowerCase().includes('bike') || description.toLowerCase().includes('kayak') || description.toLowerCase().includes('equipment')) {
                     suggestedCategory = amount < 0 ? 'Asset' : 'Revenue';
+                    accountType = suggestedCategory;
                     journalNote = amount < 0 ? 'Equipment purchase' : 'Equipment rental revenue';
                 }
                 else if (description.toLowerCase().includes('tour') || description.toLowerCase().includes('eco')) {
                     suggestedCategory = 'Revenue';
+                    accountType = 'Revenue';
                     journalNote = 'Tour service revenue';
                 }
                 else if (description.toLowerCase().includes('market') || description.toLowerCase().includes('advertis')) {
                     suggestedCategory = 'Expense';
+                    accountType = 'Expense';
                     journalNote = 'Marketing and promotion';
+                }
+                else if (description.toLowerCase().includes('loan') || description.toLowerCase().includes('payable')) {
+                    suggestedCategory = 'Liability';
+                    accountType = 'Liability';
+                    journalNote = 'Loan transaction';
+                }
+                
+                // Determine debit/credit based on amount and account type
+                let debitCredit = '';
+                if (accountType && accountingRules[accountType]) {
+                    debitCredit = accountingRules[accountType](amount);
                 }
                 
                 // Update stats
@@ -313,19 +414,25 @@
                 else if (suggestedCategory === 'Revenue') stats.revenue++;
                 else if (suggestedCategory === 'Expense') stats.expense++;
                 else if (suggestedCategory === 'Asset') stats.asset++;
+                else if (suggestedCategory === 'Liability') stats.liability++;
+                else if (suggestedCategory === 'Equity') stats.equity++;
                 
                 return {
                     ...transaction,
                     SuggestedCategory: suggestedCategory,
                     FinalCategory: suggestedCategory,
+                    AccountType: accountType,
+                    DebitCredit: debitCredit,
                     JournalNote: journalNote,
-                    IsCategorized: !!suggestedCategory
+                    IsCategorized: !!suggestedCategory,
+                    Amount: amount
                 };
             });
             
             showAnalysisResults(stats);
             displayTransactions();
             elements.exportBtn.disabled = false;
+            elements.rulesInfo.classList.remove('hidden');
         }
 
         // Display transactions for categorization
@@ -336,16 +443,24 @@
             
             filteredTransactions.forEach((transaction, index) => {
                 const transactionEl = document.createElement('div');
-                transactionEl.className = `transaction-row p-4 ${transaction.IsCategorized ? 'categorized' : 'uncategorized'}`;
+                transactionEl.className = `transaction-row p-4 ${transaction.IsCategorized ? 'categorized' : 'uncategorized'} ${transaction.DebitCredit === 'debit' ? 'debit' : transaction.DebitCredit === 'credit' ? 'credit' : ''}`;
+                
+                const amountColor = transaction.Amount < 0 ? 'text-red-600' : 'text-green-600';
+                const amountSign = transaction.Amount < 0 ? '-' : '+';
                 
                 transactionEl.innerHTML = `
                     <div class="flex flex-wrap items-center gap-4">
                         <div class="flex-1 min-w-64">
                             <div class="flex items-center gap-2">
                                 <span class="font-medium text-gray-900">${transaction.Date || 'No date'}</span>
-                                <span class="text-xs px-2 py-1 rounded ${transaction.Amount < 0 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
-                                    $${Math.abs(transaction.Amount).toFixed(2)}
+                                <span class="text-xs px-2 py-1 rounded ${amountColor} bg-gray-100">
+                                    ${amountSign}$${Math.abs(transaction.Amount).toFixed(2)}
                                 </span>
+                                ${transaction.DebitCredit ? `
+                                    <span class="text-xs px-2 py-1 rounded ${transaction.DebitCredit === 'debit' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                                        ${transaction.DebitCredit.toUpperCase()}
+                                    </span>
+                                ` : ''}
                             </div>
                             <div class="text-sm text-gray-600 mt-1">${transaction.Description || 'No description'}</div>
                             <div class="text-xs text-gray-500 mt-1">${transaction.Vendor_Customer || 'No vendor'}</div>
@@ -355,11 +470,16 @@
                             <select class="category-select border border-gray-300 rounded px-3 py-1 text-sm w-full" data-index="${index}">
                                 <option value="">-- Select Category --</option>
                                 <option value="Asset" ${transaction.FinalCategory === 'Asset' ? 'selected' : ''}>Asset</option>
-                                <option value="Expense" ${transaction.FinalCategory === 'Expense' ? 'selected' : ''}>Expense</option>
-                                <option value="Revenue" ${transaction.FinalCategory === 'Revenue' ? 'selected' : ''}>Revenue</option>
                                 <option value="Liability" ${transaction.FinalCategory === 'Liability' ? 'selected' : ''}>Liability</option>
                                 <option value="Equity" ${transaction.FinalCategory === 'Equity' ? 'selected' : ''}>Equity</option>
+                                <option value="Revenue" ${transaction.FinalCategory === 'Revenue' ? 'selected' : ''}>Revenue</option>
+                                <option value="Expense" ${transaction.FinalCategory === 'Expense' ? 'selected' : ''}>Expense</option>
                             </select>
+                            ${transaction.DebitCredit ? `
+                                <div class="text-xs mt-1 ${transaction.DebitCredit === 'debit' ? 'text-red-600' : 'text-green-600'}">
+                                    Auto-detected: ${transaction.DebitCredit}
+                                </div>
+                            ` : ''}
                         </div>
                         
                         <div class="flex-1 min-w-64">
@@ -389,18 +509,43 @@
         function updateTransactionCategory(e) {
             const index = parseInt(e.target.dataset.index);
             const category = e.target.value;
+            const amount = categorizedTransactions[index].Amount;
             
             categorizedTransactions[index].FinalCategory = category;
+            categorizedTransactions[index].AccountType = category;
             categorizedTransactions[index].IsCategorized = !!category;
+            
+            // Recalculate debit/credit based on new category
+            if (category && accountingRules[category]) {
+                categorizedTransactions[index].DebitCredit = accountingRules[category](amount);
+            } else {
+                categorizedTransactions[index].DebitCredit = '';
+            }
             
             // Update the row appearance
             const row = e.target.closest('.transaction-row');
             if (category) {
                 row.classList.remove('uncategorized');
                 row.classList.add('categorized');
+                
+                // Update debit/credit styling
+                row.classList.remove('debit', 'credit');
+                if (categorizedTransactions[index].DebitCredit === 'debit') {
+                    row.classList.add('debit');
+                } else if (categorizedTransactions[index].DebitCredit === 'credit') {
+                    row.classList.add('credit');
+                }
             } else {
                 row.classList.remove('categorized');
                 row.classList.add('uncategorized');
+                row.classList.remove('debit', 'credit');
+            }
+            
+            // Update the debit/credit display
+            const debitCreditDisplay = row.querySelector('.text-xs');
+            if (debitCreditDisplay && categorizedTransactions[index].DebitCredit) {
+                debitCreditDisplay.textContent = `Auto-detected: ${categorizedTransactions[index].DebitCredit}`;
+                debitCreditDisplay.className = `text-xs mt-1 ${categorizedTransactions[index].DebitCredit === 'debit' ? 'text-red-600' : 'text-green-600'}`;
             }
             
             updateJournalPreview();
@@ -424,12 +569,8 @@
                 filtered = filtered.filter(t => !t.IsCategorized);
             } else if (filterType === 'categorized') {
                 filtered = filtered.filter(t => t.IsCategorized);
-            } else if (filterType === 'revenue') {
-                filtered = filtered.filter(t => t.FinalCategory === 'Revenue');
-            } else if (filterType === 'expense') {
-                filtered = filtered.filter(t => t.FinalCategory === 'Expense');
-            } else if (filterType === 'asset') {
-                filtered = filtered.filter(t => t.FinalCategory === 'Asset');
+            } else if (filterType !== 'all') {
+                filtered = filtered.filter(t => t.FinalCategory === filterType);
             }
             
             // Apply sort
@@ -456,16 +597,25 @@
             elements.journalBody.innerHTML = '';
             
             const journalEntries = generateJournalEntries();
+            let totalDebits = 0;
+            let totalCredits = 0;
             
             journalEntries.forEach(entry => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-gray-100';
                 
+                if (entry.Debit) totalDebits += entry.Debit;
+                if (entry.Credit) totalCredits += entry.Credit;
+                
                 tr.innerHTML = `
                     <td class="px-4 py-3 text-gray-600 text-sm">${entry.Date}</td>
-                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Account}</td>
-                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Debit ? '$' + entry.Debit.toFixed(2) : ''}</td>
-                    <td class="px-4 py-3 text-gray-600 text-sm">${entry.Credit ? '$' + entry.Credit.toFixed(2) : ''}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm font-medium">${entry.Account}</td>
+                    <td class="px-4 py-3 text-gray-600 text-sm ${entry.Debit ? 'bg-red-50 text-red-700 font-medium' : ''}">
+                        ${entry.Debit ? '$' + entry.Debit.toFixed(2) : ''}
+                    </td>
+                    <td class="px-4 py-3 text-gray-600 text-sm ${entry.Credit ? 'bg-green-50 text-green-700 font-medium' : ''}">
+                        ${entry.Credit ? '$' + entry.Credit.toFixed(2) : ''}
+                    </td>
                     <td class="px-4 py-3 text-gray-600 text-sm">${entry.Description}</td>
                     <td class="px-4 py-3 text-gray-600 text-sm">
                         <span class="px-2 py-1 rounded text-xs ${getCategoryColor(entry.Category)}">${entry.Category}</span>
@@ -475,7 +625,12 @@
                 elements.journalBody.appendChild(tr);
             });
             
-            elements.previewFooter.textContent = `Generated ${journalEntries.length} journal entries`;
+            elements.entriesCount.textContent = `Generated ${journalEntries.length} journal entries`;
+            
+            // Check if debits equal credits
+            const isBalanced = Math.abs(totalDebits - totalCredits) < 0.01;
+            elements.balanceCheck.textContent = `Debits: $${totalDebits.toFixed(2)} | Credits: $${totalCredits.toFixed(2)} | ${isBalanced ? '✅ Balanced' : '❌ Not Balanced'}`;
+            elements.balanceCheck.className = `font-medium ${isBalanced ? 'text-green-600' : 'text-red-600'}`;
         }
 
         // Generate proper journal entries
@@ -483,73 +638,59 @@
             const entries = [];
             
             categorizedTransactions.forEach(transaction => {
-                if (!transaction.FinalCategory) return;
+                if (!transaction.FinalCategory || !transaction.DebitCredit) return;
                 
-                const amount = parseFloat(transaction.Amount) || 0;
-                const isNegative = amount < 0;
-                const absAmount = Math.abs(amount);
+                const amount = Math.abs(transaction.Amount);
+                const description = transaction.JournalNote || transaction.Description;
                 
-                // Create journal entry based on category
-                if (transaction.FinalCategory === 'Revenue') {
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: 'Cash',
-                        Debit: isNegative ? null : absAmount,
-                        Credit: isNegative ? absAmount : null,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Revenue'
-                    });
-                    
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: transaction.Account || 'Rental Revenue',
-                        Debit: isNegative ? absAmount : null,
-                        Credit: isNegative ? null : absAmount,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Revenue'
-                    });
-                }
-                else if (transaction.FinalCategory === 'Expense') {
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: transaction.Account || 'Various Expenses',
-                        Debit: isNegative ? absAmount : null,
-                        Credit: isNegative ? null : absAmount,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Expense'
-                    });
-                    
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: 'Cash',
-                        Debit: isNegative ? null : absAmount,
-                        Credit: isNegative ? absAmount : null,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Expense'
-                    });
-                }
-                else if (transaction.FinalCategory === 'Asset') {
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: transaction.Account || 'Equipment',
-                        Debit: isNegative ? absAmount : null,
-                        Credit: isNegative ? null : absAmount,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Asset'
-                    });
-                    
-                    entries.push({
-                        Date: transaction.Date,
-                        Account: 'Cash',
-                        Debit: isNegative ? null : absAmount,
-                        Credit: isNegative ? absAmount : null,
-                        Description: transaction.JournalNote || transaction.Description,
-                        Category: 'Asset'
-                    });
-                }
+                // Main account entry
+                entries.push({
+                    Date: transaction.Date,
+                    Account: transaction.Account || transaction.FinalCategory,
+                    Debit: transaction.DebitCredit === 'debit' ? amount : null,
+                    Credit: transaction.DebitCredit === 'credit' ? amount : null,
+                    Description: description,
+                    Category: transaction.FinalCategory
+                });
+                
+                // Counter account entry (usually Cash)
+                const counterAccount = getCounterAccount(transaction);
+                entries.push({
+                    Date: transaction.Date,
+                    Account: counterAccount,
+                    Debit: transaction.DebitCredit === 'credit' ? amount : null,
+                    Credit: transaction.DebitCredit === 'debit' ? amount : null,
+                    Description: description,
+                    Category: getAccountType(counterAccount)
+                });
             });
             
             return entries;
+        }
+
+        // Determine counter account based on transaction type
+        function getCounterAccount(transaction) {
+            // For most transactions, use Cash as counter account
+            if (transaction.FinalCategory === 'Asset' && transaction.DebitCredit === 'debit') {
+                return 'Cash'; // Buying asset with cash
+            } else if (transaction.FinalCategory === 'Asset' && transaction.DebitCredit === 'credit') {
+                return 'Cash'; // Selling asset for cash
+            } else if (transaction.FinalCategory === 'Expense') {
+                return 'Cash'; // Paying expense with cash
+            } else if (transaction.FinalCategory === 'Revenue') {
+                return 'Cash'; // Receiving cash for revenue
+            } else if (transaction.FinalCategory === 'Liability' && transaction.DebitCredit === 'credit') {
+                return 'Cash'; // Receiving loan proceeds
+            } else if (transaction.FinalCategory === 'Liability' && transaction.DebitCredit === 'debit') {
+                return 'Cash'; // Paying down loan
+            } else {
+                return 'Cash'; // Default
+            }
+        }
+
+        // Get account type for display
+        function getAccountType(accountName) {
+            return accountTypes[accountName] || 'Asset'; // Default to Asset
         }
 
         // Get color for category badge
@@ -573,11 +714,11 @@
                     <span class="font-medium">${stats.total}</span>
                 </div>
                 <div class="flex items-center justify-between py-2 border-b border-gray-200">
-                    <span class="text-gray-600">Revenue Transactions</span>
+                    <span class="text-gray-600">Revenue</span>
                     <span class="font-medium text-green-600">${stats.revenue}</span>
                 </div>
                 <div class="flex items-center justify-between py-2 border-b border-gray-200">
-                    <span class="text-gray-600">Expense Transactions</span>
+                    <span class="text-gray-600">Expenses</span>
                     <span class="font-medium text-red-600">${stats.expense}</span>
                 </div>
                 <div class="flex items-center justify-between py-2">
@@ -604,6 +745,7 @@
             elements.journalInterface.classList.add('hidden');
             elements.previewDiv.classList.add('hidden');
             elements.exportBtn.disabled = true;
+            elements.rulesInfo.classList.add('hidden');
         }
 
         function exportJournal() {
